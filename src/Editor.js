@@ -4,21 +4,22 @@ import { useRef, useState } from 'react'
 
 function Editor() {
   let [moreChildren, setMoreChildren] = useState([]) // TODO: r to mm (moreRows); const
-  let idx = useRef(1)
+  let idx = useRef(2)
 
   function handleEnter(e) {  // TODO: r to m
     if (e.key === 'Enter') {
       e.preventDefault()
-      idx.current = idx.current + 1 // TODO: ++
+
+      let newIdx = idx.current++ // TODO: ++ | simply new line
       console.log('Enter!!!!!') // TODO: r
-      setMoreChildren([...moreChildren, <Row key={idx.current} onEnter={handleEnter} />]) // TODO: ofc mm
+      setMoreChildren([...moreChildren, newIdx]) // TODO: ofc mm
     }
   }
 
   return (
     <section className="editor">
-      <Row key={idx.current} placeholder="Write something..." onEnter={handleEnter} />
-      {moreChildren}
+      <Row key={1} placeholder="Write something..." onEnter={handleEnter} />
+      {moreChildren.map(c => (<Row key={c} onEnter={handleEnter} />))}
     </section>
   )
 }
