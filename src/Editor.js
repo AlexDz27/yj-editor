@@ -1,21 +1,23 @@
 import './editor.css'
 import './row.css'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 function Editor() {
   let [moreChildren, setMoreChildren] = useState([]) // TODO: r to mm (moreRows); const
+  let idx = useRef(1)
 
   function handleEnter(e) {  // TODO: r to m
     if (e.key === 'Enter') {
       e.preventDefault()
+      idx.current = idx.current + 1 // TODO: ++
       console.log('Enter!!!!!') // TODO: r
-      setMoreChildren([...moreChildren, <Row onEnter={handleEnter} />]) // TODO: ofc mm
+      setMoreChildren([...moreChildren, <Row key={idx.current} onEnter={handleEnter} />]) // TODO: ofc mm
     }
   }
 
   return (
     <section className="editor">
-      <Row placeholder="Write something..." onEnter={handleEnter} />
+      <Row key={idx.current} placeholder="Write something..." onEnter={handleEnter} />
       {moreChildren}
     </section>
   )
