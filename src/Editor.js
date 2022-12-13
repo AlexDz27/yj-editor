@@ -1,30 +1,19 @@
 import './editor.css'
 import './row.css'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 function Editor() {
-  let [moreChildren, setMoreChildren] = useState([]) // TODO: r to mm (moreRows); const
-  let idx = useRef(2)
-
-  function handleEnter(e) {  // TODO: r to m
-    if (e.key === 'Enter') {
-      e.preventDefault()
-
-      let newIdx = idx.current++ // TODO: ++ | simply new line
-      console.log('Enter!!!!!') // TODO: r
-      setMoreChildren([...moreChildren, newIdx]) // TODO: ofc mm
-    }
-  }
+  let [moreChildren, setMoreChildren] = useState([])
 
   return (
     <section className="editor">
-      <Row key={1} placeholder="Write something..." onEnter={handleEnter} />
-      {moreChildren.map(c => (<Row key={c} onEnter={handleEnter} />))}
+      <Row key={1} placeholder="Write something..." />
+      {moreChildren}
     </section>
   )
 }
 
-function Row({ placeholder, onEnter }) {
+function Row({ placeholder }) {
   const [isBeingEdited, setIsBeingEdited] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   function setBackground() {
@@ -38,11 +27,17 @@ function Row({ placeholder, onEnter }) {
     setIsHovered(false)
   }
 
+  function handleEnter(e) { // TODO: m
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+    }
+  }
+
   return (
     <div
       contentEditable="true"
       suppressContentEditableWarning="true"
-      onKeyDown={onEnter}
+      onKeyDown={handleEnter}
       onMouseEnter={setBackground}
       onMouseLeave={unsetBackground}
       onFocus={setBackground}
