@@ -6,7 +6,6 @@ function Editor() {
   return (
     <section className="editor">
       <Row placeholder="Write something..." />
-      <button>qwe</button>
     </section>
   )
 }
@@ -14,14 +13,14 @@ function Editor() {
 function Row({ placeholder }) {
   const [isBeingEdited, setIsBeingEdited] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
-  function handleSettingBackground() {
+  function setBackground() {
     if (isBeingEdited) {
-      handleUnsettingBackground()
+      unsetBackground()
       return
     }
     setIsHovered(true)
   }
-  function handleUnsettingBackground() {  // TODO: r to unsetBackground
+  function unsetBackground() {
     setIsHovered(false)
   }
 
@@ -34,18 +33,18 @@ function Row({ placeholder }) {
       contentEditable="true"
       suppressContentEditableWarning="true"
       onKeyDown={handleEnter}
-      onMouseEnter={handleSettingBackground}
-      onMouseLeave={handleUnsettingBackground}
-      onFocus={handleSettingBackground}
+      onMouseEnter={setBackground}
+      onMouseLeave={unsetBackground}
+      onFocus={setBackground}
       onInput={() => {
-        handleUnsettingBackground()
+        unsetBackground()
         setIsBeingEdited(true)
       }}
       onBlur={() => {
         setIsBeingEdited(false)
-        handleUnsettingBackground()
+        unsetBackground()
       }}
-      onClick={handleUnsettingBackground}
+      onClick={unsetBackground}
       className="row"
       style={{backgroundColor: isHovered ? '#f0f0f0' : 'initial'}}
     >
