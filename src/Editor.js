@@ -45,7 +45,7 @@ function Row({ placeholder }) {
         setIsBeingEdited(false)
         handleUnsettingBackground()
       }}
-      onClick={() => console.log('todo: 123')}
+      onClick={handleUnsettingBackground}
       className="row"
       style={{backgroundColor: isHovered ? '#f0f0f0' : 'initial'}}
     >
