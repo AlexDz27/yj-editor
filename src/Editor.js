@@ -27,7 +27,7 @@ function Row({ placeholder }) {
     setIsHovered(false)
   }
   function handleBackgroundOnClick() {
-    if (placeholder) return
+    if (textRef.current === placeholder) return
     if (textRef.current === '') return
 
     handleUnsettingBackground()
@@ -37,7 +37,6 @@ function Row({ placeholder }) {
     if (e.key === 'Enter') console.log('Enter!!!!!')
   }
 
-  let text = placeholder
   return (
     <div
       ref={htmlRef}
@@ -60,7 +59,7 @@ function Row({ placeholder }) {
       className="row"
       style={{backgroundColor: isHovered ? '#f0f0f0' : 'initial'}}
     >
-      {text}
+      {textRef.current}
     </div>
   )
 }
