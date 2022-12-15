@@ -1,6 +1,6 @@
 import './editor.css'
 import './row.css'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 function Editor() {
   let [moreRows, setMoreRows] = useState([])
@@ -18,6 +18,7 @@ function Editor() {
 }
 
 function Row({ placeholder, addRows }) {
+  const ref = useRef(null)
   const [isBeingEdited, setIsBeingEdited] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   function setBackground() {
@@ -42,10 +43,13 @@ function Row({ placeholder, addRows }) {
 
   return (
     <div
+      ref={ref}
       contentEditable="true"
       suppressContentEditableWarning="true"
       onKeyDown={handleEnter}
-      onMouseEnter={setBackground}
+      onMouseEnter={() => {
+        if (document.activeElement !== ref.current) setBackground()
+      }}
       onMouseLeave={unsetBackground}
       onFocus={setBackground}
       onInput={() => {
