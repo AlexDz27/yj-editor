@@ -1,27 +1,23 @@
 import './editor.css'
 import './row.css'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 function Editor() {
-  let [moreChildren, setMoreChildren] = useState([])
-  let moreChildrenRef = useRef(moreChildren)
-  let idx = useRef(2)
+  let [moreRows, setMoreRows] = useState([])
 
-  function onEnter() { // TODO: m
-    // debugger
-    moreChildrenRef.current = [...moreChildrenRef.current, <Row key={idx.current++} onEnter={onEnter} />]
-    setMoreChildren(moreChildrenRef.current) // TODO: might be wrong
+  function addRows() {
+    setMoreRows([...moreRows, moreRows.length + 2])
   }
 
   return (
     <section className="editor">
-      <Row key={1} placeholder="Write something..." onEnter={onEnter} />
-      {moreChildren}
+      <Row key={1} placeholder="Write something..." addRows={addRows} />
+      {moreRows.map(i => <Row key={i} addRows={addRows} />)}
     </section>
   )
 }
 
-function Row({ placeholder, onEnter }) { // TODO: m onEnter
+function Row({ placeholder, addRows }) {
   const [isBeingEdited, setIsBeingEdited] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   function setBackground() {
@@ -35,11 +31,13 @@ function Row({ placeholder, onEnter }) { // TODO: m onEnter
     setIsHovered(false)
   }
 
-  function handleEnter(e) { // TODO: m
+  function handleEnter(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      onEnter()
+      addRows()
     }
+
+    unsetBackground()
   }
 
   return (
