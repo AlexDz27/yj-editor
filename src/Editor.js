@@ -1,19 +1,27 @@
 import './editor.css'
 import './row.css'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 function Editor() {
   let [moreChildren, setMoreChildren] = useState([])
+  let moreChildrenRef = useRef(moreChildren)
+  let idx = useRef(2)
+
+  function onEnter() { // TODO: m
+    // debugger
+    moreChildrenRef.current = [...moreChildrenRef.current, <Row key={idx.current++} onEnter={onEnter} />]
+    setMoreChildren(moreChildrenRef.current) // TODO: might be wrong
+  }
 
   return (
     <section className="editor">
-      <Row key={1} placeholder="Write something..." />
+      <Row key={1} placeholder="Write something..." onEnter={onEnter} />
       {moreChildren}
     </section>
   )
 }
 
-function Row({ placeholder }) {
+function Row({ placeholder, onEnter }) { // TODO: m onEnter
   const [isBeingEdited, setIsBeingEdited] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   function setBackground() {
@@ -30,6 +38,7 @@ function Row({ placeholder }) {
   function handleEnter(e) { // TODO: m
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
+      onEnter()
     }
   }
 
