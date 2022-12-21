@@ -5,19 +5,23 @@ import { useRef, useState } from 'react'
 function Editor() {
   let [moreRows, setMoreRows] = useState([])
 
-  function addRows() {
-    setMoreRows([...moreRows, {key: String(Math.random())}])
+  function addRows(posIdx) {
+    setMoreRows([
+      ...moreRows.slice(0, posIdx),
+      {key: String(Math.random())},
+      ...moreRows.slice(posIdx)
+    ])
   }
 
   return (
     <section className="editor">
-      <Row key={1} placeholder="Write something..." posIdx={1} addRows={addRows} />
-      {moreRows.map((rObj, i) => <Row key={rObj.key} posIdx={i + 2} addRows={addRows} />)}
+      <Row key={0} placeholder="Write something..." posIdx={0} addRows={addRows} />
+      {moreRows.map((r, i) => <Row key={r.key} posIdx={i + 1} addRows={addRows} />)}
     </section>
   )
 }
 
-function Row({ placeholder, addRows }) {
+function Row({ placeholder, posIdx, addRows }) {
   const ref = useRef(null)
   const [isBeingEdited, setIsBeingEdited] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
@@ -35,7 +39,7 @@ function Row({ placeholder, addRows }) {
   function handleEnter(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      addRows()
+      addRows(posIdx)
     }
 
     unsetBackground()
