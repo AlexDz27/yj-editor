@@ -36,10 +36,15 @@ function Row({ placeholder, posIdx, addRows }) {
     setIsHovered(false)
   }
 
-  function handleEnter(e) {
+  function handleEnterAndArrows(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       addRows(posIdx)
+    }
+
+    // TODO: много текста?
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      console.log('down or up!')
     }
 
     unsetBackground()
@@ -54,7 +59,7 @@ function Row({ placeholder, posIdx, addRows }) {
       ref={ref}
       contentEditable="true"
       suppressContentEditableWarning="true"
-      onKeyDown={handleEnter}
+      onKeyDown={handleEnterAndArrows}
       onMouseEnter={() => {
         if (document.activeElement !== ref.current) setBackground()
       }}
