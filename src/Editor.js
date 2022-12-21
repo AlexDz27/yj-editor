@@ -6,13 +6,13 @@ function Editor() {
   let [moreRows, setMoreRows] = useState([])
 
   function addRows() {
-    setMoreRows([...moreRows, moreRows.length + 2])
+    setMoreRows([...moreRows, {key: String(Math.random())}])
   }
 
   return (
     <section className="editor">
-      <Row key={1} placeholder="Write something..." addRows={addRows} />
-      {moreRows.map(i => <Row key={i} addRows={addRows} />)}
+      <Row key={1} placeholder="Write something..." posIdx={1} addRows={addRows} />
+      {moreRows.map((rObj, i) => <Row key={rObj.key} posIdx={i + 2} addRows={addRows} />)}
     </section>
   )
 }
