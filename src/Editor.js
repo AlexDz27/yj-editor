@@ -1,6 +1,6 @@
 import './editor.css'
 import './row.css'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react';
 
 function Editor() {
   let [moreRows, setMoreRows] = useState([])
@@ -44,6 +44,10 @@ function Row({ placeholder, posIdx, addRows }) {
 
     unsetBackground()
   }
+
+  useEffect(() => {
+    ref.current.focus()
+  }, [])
 
   return (
     <div
