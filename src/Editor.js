@@ -1,6 +1,6 @@
 import './editor.css'
 import './row.css'
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react'
 
 function Editor() {
   let [moreRows, setMoreRows] = useState([])
@@ -8,7 +8,7 @@ function Editor() {
   function addRows(posIdx) {
     setMoreRows([
       ...moreRows.slice(0, posIdx),
-      {key: String(Math.random())},
+      { key: String(Math.random()) },
       ...moreRows.slice(posIdx)
     ])
   }
@@ -87,7 +87,7 @@ function Row({ placeholder, posIdx, addRows }) {
       }}
       onClick={unsetBackground}
       className="row"
-      style={{backgroundColor: isHovered ? '#f0f0f0' : 'initial'}}
+      style={{ backgroundColor: isHovered ? '#f0f0f0' : 'initial' }}
     >
       {placeholder}
     </div>
