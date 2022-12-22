@@ -51,6 +51,14 @@ function Row({ placeholder, posIdx, addRows }) {
   }
 
   useEffect(() => {
+    if (posIdx === 0) {
+      let range = new Range()
+      range.setStart(ref.current.firstChild, 18)
+      range.setEnd(ref.current.firstChild, 18)
+      document.getSelection().addRange(range)
+      return
+    }
+
     ref.current.focus()
   }, [])
 
