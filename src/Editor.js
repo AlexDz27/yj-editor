@@ -1,6 +1,7 @@
 import './editor.css'
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
+import { getCaretIndex } from './functions'
 
 function Editor() {
   let [moreRows, setMoreRows] = useState([])
@@ -44,11 +45,12 @@ function Row({ placeholder, posIdx, addRows }) {
 
     // TODO: много текста?
     if (e.key === 'ArrowDown') {
-      ref.current.nextSibling.focus()
-      console.log(window.getSelection())
+      console.log(getCaretIndex(ref.current))
+
+      // ref.current.nextSibling.focus()  // TODO: change to smth with coords
     }
     if (e.key === 'ArrowUp') {
-      ref.current.previousSibling.focus()
+      // ref.current.previousSibling.focus()
     }
 
     unsetBackground()
