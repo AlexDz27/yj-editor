@@ -43,8 +43,12 @@ function Row({ placeholder, posIdx, addRows }) {
     }
 
     // TODO: много текста?
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      console.log('down or up!')
+    if (e.key === 'ArrowDown') {
+      ref.current.nextSibling.focus()
+      console.log(window.getSelection())
+    }
+    if (e.key === 'ArrowUp') {
+      ref.current.previousSibling.focus()
     }
 
     unsetBackground()
