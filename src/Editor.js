@@ -45,54 +45,10 @@ function Row({ placeholder, posIdx, addRows }) {
 
     // TODO: много текста?
     if (e.key === 'ArrowDown') {
-      console.log(getCaretIndex(ref.current))
-      let i = getCaretIndex(ref.current)
-      let caretCoordsXBefore = getCaretCoordinates().x
-      console.log({caretCoordsXBefore})
-      // TODO: #1
-      e.preventDefault()
-      document.getSelection().removeAllRanges()
-      let range = new Range()
-      range.setStart(ref.current.nextSibling.firstChild, i)
-      range.setEnd(ref.current.nextSibling.firstChild, i)
-      document.getSelection().addRange(range)
-
-      console.log({caretCoordsXAfter: getCaretCoordinates().x})
-      let caretCoordsXAfter = getCaretCoordinates().x
-      while (caretCoordsXAfter > caretCoordsXBefore) {
-        document.getSelection().removeAllRanges()
-        let range = new Range()
-        range.setStart(ref.current.nextSibling.firstChild, i++)
-        range.setEnd(ref.current.nextSibling.firstChild, i++)
-        document.getSelection().addRange(range)
-
-        caretCoordsXBefore = getCaretCoordinates().x
-      }
+      console.log('down')
     }
     if (e.key === 'ArrowUp') {
-      console.log(getCaretIndex(ref.current))
-      let i = getCaretIndex(ref.current)
-      const caretCoordsXBefore = getCaretCoordinates().x
-      console.log({caretCoordsXBefore})
-      // TODO: #1
-      e.preventDefault()
-      document.getSelection().removeAllRanges()
-      let range = new Range()
-      range.setStart(ref.current.previousSibling.firstChild, i)
-      range.setEnd(ref.current.previousSibling.firstChild, i)
-      document.getSelection().addRange(range)
-
-      console.log({caretCoordsXAfter: getCaretCoordinates().x})
-      let caretCoordsXAfter = getCaretCoordinates().x
-      while (caretCoordsXAfter < caretCoordsXBefore) {
-        document.getSelection().removeAllRanges()
-        let range = new Range()
-        range.setStart(ref.current.previousSibling.firstChild, i++)
-        range.setEnd(ref.current.previousSibling.firstChild, i++)
-        document.getSelection().addRange(range)
-
-        caretCoordsXAfter = getCaretCoordinates().x
-      }
+      console.log('up')
     }
 
     unsetBackground()
@@ -129,10 +85,7 @@ function Row({ placeholder, posIdx, addRows }) {
         setIsBeingEdited(false)
         unsetBackground()
       }}
-      onClick={() => {
-        unsetBackground()
-        console.log({caretCoordsX: getCaretCoordinates().x})
-      }}
+      onClick={unsetBackground}
       className="row"
       style={{ backgroundColor: isHovered ? '#f0f0f0' : 'initial' }}
     >
