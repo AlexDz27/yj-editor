@@ -45,10 +45,26 @@ function Row({ placeholder, posIdx, addRows }) {
 
     // TODO: много текста?
     if (e.key === 'ArrowDown') {
-      console.log('down')
+      // TODO: #1
+      e.preventDefault()
+
+      let i = getCaretIndex(ref.current)
+      document.getSelection().removeAllRanges()
+      let range = new Range()
+      range.setStart(ref.current.nextSibling.firstChild, i)
+      range.setEnd(ref.current.nextSibling.firstChild, i)
+      document.getSelection().addRange(range)
     }
     if (e.key === 'ArrowUp') {
-      console.log('up')
+      // TODO: #1
+      e.preventDefault()
+
+      let i = getCaretIndex(ref.current)
+      document.getSelection().removeAllRanges()
+      let range = new Range()
+      range.setStart(ref.current.previousSibling.firstChild, i)
+      range.setEnd(ref.current.previousSibling.firstChild, i)
+      document.getSelection().addRange(range)
     }
 
     unsetBackground()
