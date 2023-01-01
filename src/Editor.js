@@ -49,22 +49,32 @@ function Row({ placeholder, posIdx, addRows }) {
       e.preventDefault()
 
       let i = getCaretIndex(ref.current)
+      let iXCoordBefore = getCaretCoordinates().x
+      console.log({iXCoordBefore})
       document.getSelection().removeAllRanges()
       let range = new Range()
       range.setStart(ref.current.nextSibling.firstChild, i)
       range.setEnd(ref.current.nextSibling.firstChild, i)
       document.getSelection().addRange(range)
+
+      let iXCoordAfter = getCaretCoordinates().x
+      console.log({iXCoordAfter})
     }
     if (e.key === 'ArrowUp') {
       // TODO: #1
       e.preventDefault()
 
       let i = getCaretIndex(ref.current)
+      let iXCoordBefore = getCaretCoordinates().x
+      console.log({iXCoordBefore})
       document.getSelection().removeAllRanges()
       let range = new Range()
       range.setStart(ref.current.previousSibling.firstChild, i)
       range.setEnd(ref.current.previousSibling.firstChild, i)
       document.getSelection().addRange(range)
+
+      let iXCoordAfter = getCaretCoordinates().x
+      console.log({iXCoordAfter})
     }
 
     unsetBackground()
@@ -101,7 +111,11 @@ function Row({ placeholder, posIdx, addRows }) {
         setIsBeingEdited(false)
         unsetBackground()
       }}
-      onClick={unsetBackground}
+      onClick={() => {
+        unsetBackground()
+        const iXCoordOnClick = getCaretCoordinates().x
+        console.log({iXCoordOnClick})
+      }}
       className="row"
       style={{ backgroundColor: isHovered ? '#f0f0f0' : 'initial' }}
     >
