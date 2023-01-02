@@ -1,7 +1,6 @@
 import './editor.css'
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
-import { getCaretIndex } from './functions'
 
 function Editor() {
   let [moreRows, setMoreRows] = useState([])
@@ -16,7 +15,9 @@ function Editor() {
 
   return (
     <section className="editor">
-      <Row key={0} placeholder="Write something..." posIdx={0} addRows={addRows} />
+      <Row key={0} placeholder="Write something... 123 123sdak kasdsa ksakd askkas ka skdksakda skd sk dasdaks da ks 123u 12u312 u321u3 12u83 12u3 128u3 21u3 12u3 12u12u8" posIdx={0} addRows={addRows} />
+      <Row key={1} placeholder="qwe qwe kqwek qwk ewkwqke kqw kqwek qwk eqwek kaskdkas ak ask dsakask ksa kkwqk ksadaksd kask ask saksak askdwqk1 123 123 123 21 j213 1230 12 j2 i3j31i j" posIdx={1} addRows={addRows} />
+      <Row key={2} placeholder="123123123 123123 123 1312 12" posIdx={2} addRows={addRows} />
       {moreRows.map((r, i) => <Row key={r.key} posIdx={i + 1} addRows={addRows} />)}
     </section>
   )
@@ -43,14 +44,15 @@ function Row({ placeholder, posIdx, addRows }) {
       addRows(posIdx)
     }
 
-    // TODO: много текста?
     if (e.key === 'ArrowDown') {
-      console.log(getCaretIndex(ref.current))
+      e.preventDefault()
 
-      // ref.current.nextSibling.focus()  // TODO: change to smth with coords
+      console.log('going down')
     }
     if (e.key === 'ArrowUp') {
-      // ref.current.previousSibling.focus()
+      e.preventDefault()
+
+      console.log('going up')
     }
 
     unsetBackground()
