@@ -16,8 +16,7 @@ function Editor() {
 
   return (
     <section className="editor">
-      {/* // TODO: del write */}
-      <Row key={0} placeholder="qwe qweqweqw qw qw" posIdx={0} addRows={addRows} />
+      <Row key={0} placeholder="Write something..." posIdx={0} addRows={addRows} />
       {moreRows.map((r, i) => <Row key={r.key} posIdx={i + 1} addRows={addRows} />)}
     </section>
   )
@@ -46,6 +45,7 @@ function Row({ placeholder, posIdx, addRows }) {
 
     // TODO: #1 много текста?
     if (e.key === 'ArrowDown') {
+      if (ref.current.nextSibling === null) {e.preventDefault(); return}
       e.preventDefault()
 
       let i = getCaretIndex(ref.current)
@@ -57,8 +57,19 @@ function Row({ placeholder, posIdx, addRows }) {
         range.setStart(ref.current.nextSibling.firstChild, i)
         range.setEnd(ref.current.nextSibling.firstChild, i)
         document.getSelection().addRange(range)
+        // handle going from empty to full row [down] case
+        if (i === 0) {
+          ref.current.nextSibling.focus()
+          return
+        }
       } catch (e) {
         // TODO: exact err...
+        // handle empty row case
+        if (ref.current.nextSibling.firstChild === null) {
+          ref.current.nextSibling.focus()
+          return
+        }
+
         let range = new Range()
         range.setStart(ref.current.nextSibling.firstChild, ref.current.nextSibling.firstChild.length)
         range.setEnd(ref.current.nextSibling.firstChild, ref.current.nextSibling.firstChild.length)
@@ -96,6 +107,8 @@ function Row({ placeholder, posIdx, addRows }) {
       }
     }
     if (e.key === 'ArrowUp') {
+      if (posIdx === 0) {e.preventDefault(); return}
+
       // TODO: #1 много текста?
       e.preventDefault()
 
@@ -108,8 +121,19 @@ function Row({ placeholder, posIdx, addRows }) {
         range.setStart(ref.current.previousSibling.firstChild, i)
         range.setEnd(ref.current.previousSibling.firstChild, i)
         document.getSelection().addRange(range)
+        // handle going from empty to full row [up] case
+        if (i === 0) {
+          ref.current.previousSibling.focus()
+          return
+        }
       } catch (e) {
         // TODO: exact err...
+        // handle empty row case
+        if (ref.current.previousSibling.firstChild === null) {
+          ref.current.previousSibling.focus()
+          return
+        }
+
         let range = new Range()
         range.setStart(ref.current.previousSibling.firstChild, ref.current.previousSibling.firstChild.length)
         range.setEnd(ref.current.previousSibling.firstChild, ref.current.previousSibling.firstChild.length)
@@ -128,7 +152,7 @@ function Row({ placeholder, posIdx, addRows }) {
           range.setStart(ref.current.previousSibling.firstChild, --i)
           range.setEnd(ref.current.previousSibling.firstChild, i)
         } else if (iXCoordAfter < iXCoordBefore) {
-          // go right HERE!!!
+          // go right
           // handle the case where going up with ooooooo[|] and ooooooooooo[|]
           try {
             range.setStart(ref.current.previousSibling.firstChild, ++i)
@@ -157,9 +181,6 @@ function Row({ placeholder, posIdx, addRows }) {
       document.getSelection().addRange(range)
       return
     }
-
-    // TODO: del
-    if (posIdx === 1) ref.current.innerText = 'Write something... 123 12312 123 1212 12312312 121321 21'
 
     ref.current.focus()
   }, [])
