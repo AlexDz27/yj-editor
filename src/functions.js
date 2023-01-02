@@ -44,8 +44,3 @@ export function isInDiapason(value1, value2, diapason) {
   if (Math.abs(delta) < diapason) return true
   return false
 }
-
-export function whereToGoFromDiapason(delta, diapason) {
-  if (delta < diapason) return 'right'
-  else return 'left'
-}

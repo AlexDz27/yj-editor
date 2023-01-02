@@ -1,7 +1,7 @@
 import './editor.css'
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
-import { getCaretCoordinates, getCaretIndex, isInDiapason, whereToGoFromDiapason } from './functions'
+import { getCaretCoordinates, getCaretIndex, isInDiapason } from './functions'
 
 function Editor() {
   let [moreRows, setMoreRows] = useState([])
@@ -99,7 +99,6 @@ function Row({ placeholder, posIdx, addRows }) {
         let range = new Range()
         if (iXCoordAfter > iXCoordBefore) {
           // go left
-          let iToPut = i
           range.setStart(ref.current.previousSibling.firstChild, --i)
           range.setEnd(ref.current.previousSibling.firstChild, i)
         } else if (iXCoordAfter < iXCoordBefore) {
