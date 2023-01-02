@@ -103,10 +103,19 @@ function Row({ placeholder, posIdx, addRows }) {
       let iXCoordBefore = getCaretCoordinates().x
       console.log({iXCoordBefore})
       document.getSelection().removeAllRanges()
-      let range = new Range()
-      range.setStart(ref.current.previousSibling.firstChild, i)
-      range.setEnd(ref.current.previousSibling.firstChild, i)
-      document.getSelection().addRange(range)
+      try {
+        let range = new Range()
+        range.setStart(ref.current.previousSibling.firstChild, i)
+        range.setEnd(ref.current.previousSibling.firstChild, i)
+        document.getSelection().addRange(range)
+      } catch (e) {
+        // TODO: exact err...
+        let range = new Range()
+        range.setStart(ref.current.previousSibling.firstChild, ref.current.previousSibling.firstChild.length)
+        range.setEnd(ref.current.previousSibling.firstChild, ref.current.previousSibling.firstChild.length)
+        document.getSelection().addRange(range)
+        i = getCaretIndex(ref.current.previousSibling)
+      }
 
       let iXCoordAfter = getCaretCoordinates().x
       console.log({iXCoordAfter})
@@ -119,9 +128,18 @@ function Row({ placeholder, posIdx, addRows }) {
           range.setStart(ref.current.previousSibling.firstChild, --i)
           range.setEnd(ref.current.previousSibling.firstChild, i)
         } else if (iXCoordAfter < iXCoordBefore) {
-          // go right
-          range.setStart(ref.current.previousSibling.firstChild, ++i)
-          range.setEnd(ref.current.previousSibling.firstChild, i)
+          // go right HERE!!!
+          // handle the case where going up with ooooooo[|] and ooooooooooo[|]
+          try {
+            range.setStart(ref.current.previousSibling.firstChild, ++i)
+            range.setEnd(ref.current.previousSibling.firstChild, i)
+          } catch (e) {
+            // TODO: exact err...
+            range.setStart(ref.current.previousSibling.firstChild, ref.current.previousSibling.firstChild.length)
+            range.setEnd(ref.current.previousSibling.firstChild, ref.current.previousSibling.firstChild.length)
+            document.getSelection().addRange(range)
+            break
+          }
         }
         document.getSelection().addRange(range)
         iXCoordAfter = getCaretCoordinates().x
