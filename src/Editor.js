@@ -145,6 +145,7 @@ function Row({ placeholder, posIdx, addRows }) {
       console.log({iXCoordAfter})
 
       while (!isInDiapason(iXCoordBefore, iXCoordAfter, 6)) {
+        console.log('not in d')
         document.getSelection().removeAllRanges()
         let range = new Range()
         if (iXCoordAfter > iXCoordBefore) {
@@ -159,6 +160,18 @@ function Row({ placeholder, posIdx, addRows }) {
             range.setEnd(ref.current.previousSibling.firstChild, i)
           } catch (e) {
             // TODO: exact err...
+            console.log({e})
+            console.log('somewhere')
+            // handle nextSibling case
+            if (ref.current.previousSibling.firstChild.nextSibling.nodeType === 1) {
+              /* probably i need to put here the whole logic..... */
+              i = 0
+              range.setStart(ref.current.previousSibling.firstChild.nextSibling.firstChild, ++i)
+              range.setEnd(ref.current.previousSibling.firstChild.nextSibling.firstChild, i)
+              document.getSelection().addRange(range)
+              break
+            }
+            
             range.setStart(ref.current.previousSibling.firstChild, ref.current.previousSibling.firstChild.length)
             range.setEnd(ref.current.previousSibling.firstChild, ref.current.previousSibling.firstChild.length)
             document.getSelection().addRange(range)
