@@ -24,7 +24,10 @@ function Editor() {
 }
 
 function Row({ placeholder, posIdx, addRows }) {
+  const SINGLE_LINE_ROW_MAX_HEIGHT_PX = 27
+
   const ref = useRef(null)
+  const [isWithBehavior, setIsWithBehavior] = useState(false)
   const [isBeingEdited, setIsBeingEdited] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   function setBackground() {
@@ -45,14 +48,16 @@ function Row({ placeholder, posIdx, addRows }) {
     }
 
     if (e.key === 'ArrowDown') {
-      e.preventDefault()
-
-      console.log('going down')
+      if (isWithBehavior) {
+        e.preventDefault()
+        console.log('going down, behavior fired')
+      }
     }
     if (e.key === 'ArrowUp') {
-      e.preventDefault()
-
-      console.log('going up')
+      if (isWithBehavior) {
+        e.preventDefault()
+        console.log('going up, behavior fired')
+      }
     }
 
     unsetBackground()
@@ -84,6 +89,16 @@ function Row({ placeholder, posIdx, addRows }) {
       onInput={() => {
         unsetBackground()
         setIsBeingEdited(true)
+        console.log({
+          'ref.current.getBoundingClientRect().height': ref.current.getBoundingClientRect().height,
+          SINGLE_LINE_ROW_MAX_HEIGHT_PX,
+          'ref > PX': ref.current.getBoundingClientRect().height > SINGLE_LINE_ROW_MAX_HEIGHT_PX
+        })
+        if (ref.current.getBoundingClientRect().height < SINGLE_LINE_ROW_MAX_HEIGHT_PX) {
+          setIsWithBehavior(true)  // TODO: set to true when caret is on first or last line
+        } else {
+          setIsWithBehavior(false)
+        }
       }}
       onBlur={() => {
         setIsBeingEdited(false)
@@ -91,7 +106,7 @@ function Row({ placeholder, posIdx, addRows }) {
       }}
       onClick={unsetBackground}
       className="row"
-      style={{ backgroundColor: isHovered ? '#f0f0f0' : 'initial' }}
+      style={{ backgroundColor: isHovered ? '#f0f0f0' : 'initial', color: isWithBehavior ? 'red' : 'initial' }}
     >
       {placeholder}
     </div>
