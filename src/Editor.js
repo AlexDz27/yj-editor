@@ -105,6 +105,11 @@ function Row({ placeholder, posIdx, addRows }) {
         unsetBackground()
       }}
       onClick={unsetBackground}
+      onPaste={(e) => {
+        e.preventDefault()
+        const text = e.clipboardData.getData('text/plain')
+        document.execCommand('insertText', false, text)
+      }}
       className="row"
       style={{ backgroundColor: isHovered ? '#f0f0f0' : 'initial', color: isWithBehavior ? 'red' : 'initial' }}
     >
