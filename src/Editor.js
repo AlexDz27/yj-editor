@@ -47,13 +47,17 @@ function Row({ placeholder, posIdx, addRows }) {
 
     if (e.key === 'ArrowDown') {
       if (isCaretOnLastLine(ref.current)) {
+        if (ref.current.nextSibling === null) {e.preventDefault(); return}
         e.preventDefault()
+
         console.log('going down')
       }
     }
     if (e.key === 'ArrowUp') {
       if (isCaretOnFirstLine(ref.current)) {
+        if (posIdx === 0) {e.preventDefault(); return}
         e.preventDefault()
+
         console.log('going up')
       }
     }
