@@ -1,7 +1,7 @@
 import './editor.css'
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
-import { getCaretCoordinates, getCaretIndex } from './functions'
+import { getCaretCoordinates, getCaretIndex, isInDiapason, whereToGoFromDiapason } from './functions'
 
 function Editor() {
   let [moreRows, setMoreRows] = useState([])
@@ -57,8 +57,26 @@ function Row({ placeholder, posIdx, addRows }) {
       range.setEnd(ref.current.nextSibling.firstChild, i)
       document.getSelection().addRange(range)
 
+      // TODO: rename to iXAfter, same for Before
       let iXCoordAfter = getCaretCoordinates().x
       console.log({iXCoordAfter})
+
+      while (!isInDiapason(iXCoordBefore, iXCoordAfter, 6)) {
+        document.getSelection().removeAllRanges()
+        let range = new Range()
+        if (iXCoordAfter > iXCoordBefore) {
+          // go left
+          range.setStart(ref.current.nextSibling.firstChild, --i)
+          range.setEnd(ref.current.nextSibling.firstChild, i)
+        } else if (iXCoordAfter < iXCoordBefore) {
+          // go right
+          range.setStart(ref.current.nextSibling.firstChild, ++i)
+          range.setEnd(ref.current.nextSibling.firstChild, i)
+        }
+        document.getSelection().addRange(range)
+        iXCoordBefore = iXCoordAfter
+        iXCoordAfter = getCaretIndex(ref.current.nextSibling)
+      }
     }
     if (e.key === 'ArrowUp') {
       // TODO: #1
@@ -75,6 +93,24 @@ function Row({ placeholder, posIdx, addRows }) {
 
       let iXCoordAfter = getCaretCoordinates().x
       console.log({iXCoordAfter})
+
+      while (!isInDiapason(iXCoordBefore, iXCoordAfter, 6)) {
+        document.getSelection().removeAllRanges()
+        let range = new Range()
+        if (iXCoordAfter > iXCoordBefore) {
+          // go left
+          let iToPut = i
+          range.setStart(ref.current.previousSibling.firstChild, --i)
+          range.setEnd(ref.current.previousSibling.firstChild, i)
+        } else if (iXCoordAfter < iXCoordBefore) {
+          // go right
+          range.setStart(ref.current.previousSibling.firstChild, ++i)
+          range.setEnd(ref.current.previousSibling.firstChild, i)
+        }
+        document.getSelection().addRange(range)
+        iXCoordBefore = iXCoordAfter
+        iXCoordAfter = getCaretIndex(ref.current.previousSibling)
+      }
     }
 
     unsetBackground()

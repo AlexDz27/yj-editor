@@ -38,3 +38,14 @@ export function getCaretCoordinates() {
   }
   return { x, y };
 }
+
+export function isInDiapason(value1, value2, diapason) {
+  let delta = value1 - value2
+  if (Math.abs(delta) < diapason) return true
+  return false
+}
+
+export function whereToGoFromDiapason(delta, diapason) {
+  if (delta < diapason) return 'right'
+  else return 'left'
+}
