@@ -16,7 +16,8 @@ function Editor() {
 
   return (
     <section className="editor">
-      <Row key={0} placeholder="Write something..." posIdx={0} addRows={addRows} />
+      {/* // TODO: del write */}
+      <Row key={0} placeholder="qwe qweqweqw qw qw" posIdx={0} addRows={addRows} />
       {moreRows.map((r, i) => <Row key={r.key} posIdx={i + 1} addRows={addRows} />)}
     </section>
   )
@@ -43,20 +44,27 @@ function Row({ placeholder, posIdx, addRows }) {
       addRows(posIdx)
     }
 
-    // TODO: bug#1
-    // TODO: много текста?
+    // TODO: #1 много текста?
     if (e.key === 'ArrowDown') {
-      // TODO: #1
       e.preventDefault()
 
       let i = getCaretIndex(ref.current)
       let iXCoordBefore = getCaretCoordinates().x
       console.log({iXCoordBefore})
       document.getSelection().removeAllRanges()
-      let range = new Range()
-      range.setStart(ref.current.nextSibling.firstChild, i)
-      range.setEnd(ref.current.nextSibling.firstChild, i)
-      document.getSelection().addRange(range)
+      try {
+        let range = new Range()
+        range.setStart(ref.current.nextSibling.firstChild, i)
+        range.setEnd(ref.current.nextSibling.firstChild, i)
+        document.getSelection().addRange(range)
+      } catch (e) {
+        // TODO: exact err...
+        let range = new Range()
+        range.setStart(ref.current.nextSibling.firstChild, ref.current.nextSibling.firstChild.length)
+        range.setEnd(ref.current.nextSibling.firstChild, ref.current.nextSibling.firstChild.length)
+        document.getSelection().addRange(range)
+        i = getCaretIndex(ref.current.nextSibling)
+      }
 
       // TODO: rename to iXAfter, same for Before
       let iXCoordAfter = getCaretCoordinates().x
@@ -71,15 +79,24 @@ function Row({ placeholder, posIdx, addRows }) {
           range.setEnd(ref.current.nextSibling.firstChild, i)
         } else if (iXCoordAfter < iXCoordBefore) {
           // go right
-          range.setStart(ref.current.nextSibling.firstChild, ++i)
-          range.setEnd(ref.current.nextSibling.firstChild, i)
+          // handle the case where going down with ooooooooooo[|] and ooooooo[|]
+          try {
+            range.setStart(ref.current.nextSibling.firstChild, ++i)
+            range.setEnd(ref.current.nextSibling.firstChild, i)
+          } catch (e) {
+            // TODO: exact err...
+            range.setStart(ref.current.nextSibling.firstChild, ref.current.nextSibling.firstChild.length)
+            range.setEnd(ref.current.nextSibling.firstChild, ref.current.nextSibling.firstChild.length)
+            document.getSelection().addRange(range)
+            break
+          }
         }
         document.getSelection().addRange(range)
         iXCoordAfter = getCaretCoordinates().x
       }
     }
     if (e.key === 'ArrowUp') {
-      // TODO: #1
+      // TODO: #1 много текста?
       e.preventDefault()
 
       let i = getCaretIndex(ref.current)
@@ -122,6 +139,9 @@ function Row({ placeholder, posIdx, addRows }) {
       document.getSelection().addRange(range)
       return
     }
+
+    // TODO: del
+    if (posIdx === 1) ref.current.innerText = 'Write something... 123 12312 123 1212 12312312 121321 21'
 
     ref.current.focus()
   }, [])
