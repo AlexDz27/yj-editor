@@ -43,6 +43,7 @@ function Row({ placeholder, posIdx, addRows }) {
       addRows(posIdx)
     }
 
+    // TODO: bug#1
     // TODO: много текста?
     if (e.key === 'ArrowDown') {
       // TODO: #1
@@ -74,8 +75,7 @@ function Row({ placeholder, posIdx, addRows }) {
           range.setEnd(ref.current.nextSibling.firstChild, i)
         }
         document.getSelection().addRange(range)
-        iXCoordBefore = iXCoordAfter
-        iXCoordAfter = getCaretIndex(ref.current.nextSibling)
+        iXCoordAfter = getCaretCoordinates().x
       }
     }
     if (e.key === 'ArrowUp') {
@@ -108,8 +108,7 @@ function Row({ placeholder, posIdx, addRows }) {
           range.setEnd(ref.current.previousSibling.firstChild, i)
         }
         document.getSelection().addRange(range)
-        iXCoordBefore = iXCoordAfter
-        iXCoordAfter = getCaretIndex(ref.current.previousSibling)
+        iXCoordAfter = getCaretCoordinates().x
       }
     }
 
