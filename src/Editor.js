@@ -51,6 +51,14 @@ function Row({ placeholder, posIdx, addRows }) {
         e.preventDefault()
 
         console.log('going down')
+        // land on last line (length idx)
+        // TODO: I want not to rely on firstChild bc there is bug when i have multiple <b>s inside rows
+        // TODO: maybe search learn?
+        document.getSelection().removeAllRanges()
+        let range = new Range()
+        range.setStart(ref.current.nextSibling.firstChild, 0)
+        range.setEnd(ref.current.nextSibling.firstChild, 0)
+        document.getSelection().addRange(range)
       }
     }
     if (e.key === 'ArrowUp') {
@@ -59,6 +67,12 @@ function Row({ placeholder, posIdx, addRows }) {
         e.preventDefault()
 
         console.log('going up')
+        // land on first line (0 idx)
+        document.getSelection().removeAllRanges()
+        let range = new Range()
+        range.setStart(ref.current.previousSibling.firstChild, ref.current.previousSibling.firstChild.length)
+        range.setEnd(ref.current.previousSibling.firstChild, ref.current.previousSibling.firstChild.length)
+        document.getSelection().addRange(range)
       }
     }
 

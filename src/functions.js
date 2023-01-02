@@ -95,3 +95,14 @@ export function isCaretOnLastLine(element) {
 
   return originalCaretRect.bottom === endOfElementRect.bottom
 }
+
+export function setCaretAtStartEnd( node, atEnd ) {
+  const sel = document.getSelection();
+  node = node.firstChild;
+
+  if( sel.rangeCount ){
+    ['Start', 'End'].forEach(pos =>
+      sel.getRangeAt(0)["set" + pos](node, atEnd ? node.length : 0)
+    )
+  }
+}
