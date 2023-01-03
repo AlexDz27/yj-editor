@@ -49,7 +49,7 @@ function Row({ placeholder, posIdx, addRows }) {
       if (isCaretOnLastLine(ref.current)) {
         if (ref.current.nextSibling === null) {e.preventDefault(); return}
         e.preventDefault()
-
+        // 1.
         document.getSelection().removeAllRanges()
         let range = new Range()
         let firstNode = ref.current.nextSibling.firstChild // might be textNode or regularNode. The goal is textNode
@@ -59,13 +59,15 @@ function Row({ placeholder, posIdx, addRows }) {
         range.setStart(firstNode, 0)
         range.setEnd(firstNode, 0)
         document.getSelection().addRange(range)
+        // 2.
+
       }
     }
     if (e.key === 'ArrowUp') {
       if (isCaretOnFirstLine(ref.current)) {
         if (posIdx === 0) {e.preventDefault(); return}
         e.preventDefault()
-
+        // 1.
         document.getSelection().removeAllRanges()
         let range = new Range()
         let lastNode = ref.current.previousSibling.lastChild // might be textNode or regularNode. The goal is textNode
@@ -75,6 +77,8 @@ function Row({ placeholder, posIdx, addRows }) {
         range.setStart(lastNode, lastNode.length)
         range.setEnd(lastNode, lastNode.length)
         document.getSelection().addRange(range)
+        // 2.
+
       }
     }
 
