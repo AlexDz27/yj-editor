@@ -96,13 +96,27 @@ export function isCaretOnLastLine(element) {
   return originalCaretRect.bottom === endOfElementRect.bottom
 }
 
-export function setCaretAtStartEnd( node, atEnd ) {
-  const sel = document.getSelection();
-  node = node.firstChild;
-
-  if( sel.rangeCount ){
-    ['Start', 'End'].forEach(pos =>
-      sel.getRangeAt(0)["set" + pos](node, atEnd ? node.length : 0)
-    )
+export function getCaretCoordinates() {
+  let x = 0,
+    y = 0;
+  const isSupported = typeof window.getSelection !== "undefined";
+  if (isSupported) {
+    const selection = window.getSelection();
+    if (selection.rangeCount !== 0) {
+      const range = selection.getRangeAt(0).cloneRange();
+      range.collapse(true);
+      const rect = range.getClientRects()[0];
+      if (rect) {
+        x = rect.left;
+        y = rect.top;
+      }
+    }
   }
+  return { x, y };
+}
+
+export function isInDiapason(value1, value2, diapason) {
+  let delta = value1 - value2
+  if (Math.abs(delta) < diapason) return true
+  return false
 }
