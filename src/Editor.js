@@ -50,10 +50,6 @@ function Row({ placeholder, posIdx, addRows }) {
         if (ref.current.nextSibling === null) {e.preventDefault(); return}
         e.preventDefault()
 
-        console.log('going down')
-        // land on last line (length idx)
-        // TODO: I want not to rely on firstChild bc there is bug when i have multiple <b>s inside rows
-        // TODO: maybe search learn?
         document.getSelection().removeAllRanges()
         let range = new Range()
         range.setStart(ref.current.nextSibling.firstChild, 0)
@@ -66,12 +62,14 @@ function Row({ placeholder, posIdx, addRows }) {
         if (posIdx === 0) {e.preventDefault(); return}
         e.preventDefault()
 
-        console.log('going up')
-        // land on first line (0 idx)
         document.getSelection().removeAllRanges()
         let range = new Range()
-        range.setStart(ref.current.previousSibling.firstChild, ref.current.previousSibling.firstChild.length)
-        range.setEnd(ref.current.previousSibling.firstChild, ref.current.previousSibling.firstChild.length)
+        let lastNode = ref.current.previousSibling.lastChild // might be textNode or regularNode. The goal is textNode
+        while (lastNode.nodeType !== 3) {
+          lastNode = lastNode.firstChild
+        }
+        range.setStart(lastNode, lastNode.length)
+        range.setEnd(lastNode, lastNode.length)
         document.getSelection().addRange(range)
       }
     }
