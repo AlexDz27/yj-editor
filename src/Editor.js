@@ -75,16 +75,15 @@ function Row({ placeholder, posIdx, addRows }) {
             fittingRange.setStart(currentNode, i)
             fittingRange.setEnd(currentNode, i)
             document.getSelection().addRange(fittingRange)
+          // if there is more than one node
           } else {
-            // go up if necessary
-            if (!currentNode.nextSibling) {
-              while (currentNode.parentNode !== ref.current.nextSibling) {
-                currentNode = currentNode.parentNode
-              }
+            // if necessary to go up, go up until there is place to move
+            while (!currentNode.nextSibling) {
+              currentNode = currentNode.parentNode
             }
             // move
             currentNode = currentNode.nextSibling
-            // go down (deeper) if necessary
+            // if necessary, go down (deeper)
             while (currentNode.nodeType !== 3) {
               currentNode = currentNode.firstChild
             }
