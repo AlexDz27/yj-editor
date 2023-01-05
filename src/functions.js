@@ -109,6 +109,9 @@ export function getCaretCoordinates() {
       if (rect) {
         x = rect.left;
         y = rect.top;
+      // probably i should write else bc bug w/ ceditable - if no content, rect is undefined
+      } else {
+        x = 167 // left extreme edge point
       }
     }
   }

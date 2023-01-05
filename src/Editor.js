@@ -49,6 +49,7 @@ function Row({ placeholder, posIdx, addRows }) {
       // going to the 0th char
       if (isCaretOnLastLine(ref.current)) {
         if (ref.current.nextSibling === null) {e.preventDefault(); return}
+        if (ref.current.nextSibling.firstChild === null) {ref.current.nextSibling.focus(); return}
         e.preventDefault()
 
         let xBefore = getCaretCoordinates().x
@@ -82,7 +83,7 @@ function Row({ placeholder, posIdx, addRows }) {
               currentNode = currentNode.parentNode
             }
             // move (edge case in if - ooooooooo| and ooo| situation)
-            if (currentNode.nextSibling.nodeValue.includes("\n")) {
+            if (currentNode.id === 'root') {
               return
             }
             currentNode = currentNode.nextSibling
