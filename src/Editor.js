@@ -1,7 +1,7 @@
 import './editor.css'
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
-import { isCaretOnFirstLine, isCaretOnLastLine } from './functions'
+import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, isInDiapason } from './functions'
 
 function Editor() {
   let [moreRows, setMoreRows] = useState([])
@@ -46,10 +46,13 @@ function Row({ placeholder, posIdx, addRows }) {
     }
 
     if (e.key === 'ArrowDown') {
+      // going to the 0th char
       if (isCaretOnLastLine(ref.current)) {
         if (ref.current.nextSibling === null) {e.preventDefault(); return}
         e.preventDefault()
-        // 1.
+
+        let xBefore = getCaretCoordinates().x
+        // putting
         document.getSelection().removeAllRanges()
         let range = new Range()
         let firstNode = ref.current.nextSibling.firstChild // might be textNode or regularNode. The goal is textNode
@@ -59,15 +62,55 @@ function Row({ placeholder, posIdx, addRows }) {
         range.setStart(firstNode, 0)
         range.setEnd(firstNode, 0)
         document.getSelection().addRange(range)
-        // 2.
+        // END putting
+        let xAfter = getCaretCoordinates().x
+        console.log({xBefore, xAfter})
+        let i = 0
+        while (!isInDiapason(xBefore, xAfter, 6)) {
+          // debugger
+          let fittingRange = document.getSelection().getRangeAt(0)
+          ++i
+          if (i <= firstNode.length) {
+            fittingRange.setStart(firstNode, i)
+            fittingRange.setEnd(firstNode, i)
+            document.getSelection().addRange(fittingRange)  // TODO: maybe put after if-else)
+          } else {
+            // debugger
+            // TODO: probably also cater for 3 and more tags - while on 90th line?
+            // if IBqweB kqwekI, // TODO: but what if I'qwe' ' kqwek'I? Also remove &&
+            if ((firstNode.parentNode.nextSibling && firstNode.parentNode.nextSibling.nodeType === 3) && firstNode.nextSibling?.nodeType !== 3) {
+              console.log(1)
+              firstNode = firstNode.parentNode.nextSibling
+              i = 0
+              continue
+            // if IBqweIB
+            } else {
+              // TODO: more context probably; one-liner
+              if (firstNode.nextSibling.nodeType !== 3) {
+                while (firstNode.parentNode !== ref.current.nextSibling) {
+                  console.log(2)
+                  firstNode = firstNode.parentNode
+                }
+              }
+            }
+            console.log(3)
+            firstNode = firstNode.nextSibling
+            while (firstNode.nodeType !== 3) firstNode = firstNode.firstChild
+            i = 0
+          }
 
+          xAfter = getCaretCoordinates().x  // TODO: xAfter might not be the best name, probably should've xA = xB new var, idk
+        }
       }
     }
     if (e.key === 'ArrowUp') {
+      // going to the last char
       if (isCaretOnFirstLine(ref.current)) {
         if (posIdx === 0) {e.preventDefault(); return}
         e.preventDefault()
-        // 1.
+
+        const xBefore = getCaretCoordinates().x
+        // putting
         document.getSelection().removeAllRanges()
         let range = new Range()
         let lastNode = ref.current.previousSibling.lastChild // might be textNode or regularNode. The goal is textNode
@@ -77,8 +120,10 @@ function Row({ placeholder, posIdx, addRows }) {
         range.setStart(lastNode, lastNode.length)
         range.setEnd(lastNode, lastNode.length)
         document.getSelection().addRange(range)
-        // 2.
-
+        // END putting
+        const xAfter = getCaretCoordinates().x
+        console.log({xBefore, xAfter})
+        if (!isInDiapason(xBefore, xAfter, 6)) console.log('not in diap')
       }
     }
 
