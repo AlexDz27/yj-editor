@@ -66,12 +66,30 @@ function Row({ placeholder, posIdx, addRows }) {
         let xAfter = getCaretCoordinates().x
         console.log({xBefore, xAfter})
         let i = 0
+        let currentNode = firstNode
         while (!isInDiapason(xBefore, xAfter, 6)) {
           let fittingRange = document.getSelection().getRangeAt(0)
           ++i
-          fittingRange.setStart(firstNode, i)
-          fittingRange.setEnd(firstNode, i)
-          document.getSelection().addRange(fittingRange)
+          // handle basic case - one node
+          if (i <= currentNode.length) {
+            fittingRange.setStart(currentNode, i)
+            fittingRange.setEnd(currentNode, i)
+            document.getSelection().addRange(fittingRange)
+          } else {
+            // go up if necessary
+            if (!currentNode.nextSibling) {
+              while (currentNode.parentNode !== ref.current.nextSibling) {
+                currentNode = currentNode.parentNode
+              }
+            }
+            // move
+            currentNode = currentNode.nextSibling
+            // go down (deeper) if necessary
+            while (currentNode.nodeType !== 3) {
+              currentNode = currentNode.firstChild
+            }
+            i = 0
+          }
 
           xAfter = getCaretCoordinates().x  // TODO: xAfter might not be the best name, probably should've xA = xB new var, idk
         }
