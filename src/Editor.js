@@ -81,7 +81,10 @@ function Row({ placeholder, posIdx, addRows }) {
             while (!currentNode.nextSibling) {
               currentNode = currentNode.parentNode
             }
-            // move
+            // move (edge case in if - ooooooooo| and ooo| situation)
+            if (currentNode.nextSibling.nodeValue.includes("\n")) {
+              return
+            }
             currentNode = currentNode.nextSibling
             // if necessary, go down (deeper)
             while (currentNode.nodeType !== 3) {
