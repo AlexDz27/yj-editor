@@ -101,6 +101,7 @@ function Row({ placeholder, posIdx, addRows }) {
       // going to the last char
       if (isCaretOnFirstLine(ref.current)) {
         if (posIdx === 0) {e.preventDefault(); return}
+        if (ref.current.previousSibling.firstChild === null) {ref.current.previousSibling.focus(); return}
         e.preventDefault()
 
         const xBefore = getCaretCoordinates().x
@@ -158,17 +159,21 @@ function Row({ placeholder, posIdx, addRows }) {
         setTimeout(() => {
           const xAfter = getCaretCoordinates().x
           if (xBefore === xAfter) {
-            // putting
-            document.getSelection().removeAllRanges()
-            let range = new Range()
-            let firstNode = ref.current.nextSibling.firstChild // might be textNode or regularNode. The goal is textNode
-            while (firstNode.nodeType !== 3) {
-              firstNode = firstNode.firstChild
+            if (ref.current.nextSibling.firstChild === null) {
+              ref.current.nextSibling.focus()
+            } else {
+              // putting
+              document.getSelection().removeAllRanges()
+              let range = new Range()
+              let firstNode = ref.current.nextSibling.firstChild // might be textNode or regularNode. The goal is textNode
+              while (firstNode.nodeType !== 3) {
+                firstNode = firstNode.firstChild
+              }
+              range.setStart(firstNode, 0)
+              range.setEnd(firstNode, 0)
+              document.getSelection().addRange(range)
+              // END putting
             }
-            range.setStart(firstNode, 0)
-            range.setEnd(firstNode, 0)
-            document.getSelection().addRange(range)
-            // END putting
           }
         }, 50)
       }
@@ -179,17 +184,21 @@ function Row({ placeholder, posIdx, addRows }) {
         setTimeout(() => {
           const xAfter = getCaretCoordinates().x
           if (xBefore === xAfter) {
-            // putting
-            document.getSelection().removeAllRanges()
-            let range = new Range()
-            let lastNode = ref.current.previousSibling.lastChild // might be textNode or regularNode. The goal is textNode
-            while (lastNode.nodeType !== 3) {
-              lastNode = lastNode.firstChild
+            if (ref.current.previousSibling.firstChild === null) {
+              ref.current.previousSibling.focus()
+            } else {
+              // putting
+              document.getSelection().removeAllRanges()
+              let range = new Range()
+              let lastNode = ref.current.previousSibling.lastChild // might be textNode or regularNode. The goal is textNode
+              while (lastNode.nodeType !== 3) {
+                lastNode = lastNode.firstChild
+              }
+              range.setStart(lastNode, lastNode.length)
+              range.setEnd(lastNode, lastNode.length)
+              document.getSelection().addRange(range)
+              // END putting
             }
-            range.setStart(lastNode, lastNode.length)
-            range.setEnd(lastNode, lastNode.length)
-            document.getSelection().addRange(range)
-            // END putting
           }
         }, 50)
       }
