@@ -65,7 +65,6 @@ function Row({ placeholder, posIdx, addRows }) {
         document.getSelection().addRange(range)
         // END putting
         let xAfter = getCaretCoordinates().x
-        console.log({xBefore, xAfter})
         let i = 0
         let currentNode = firstNode
         while (!isInDiapason(xBefore, xAfter, 6)) {
@@ -94,7 +93,7 @@ function Row({ placeholder, posIdx, addRows }) {
             i = 0
           }
 
-          xAfter = getCaretCoordinates().x  // TODO: xAfter might not be the best name, probably should've xA = xB new var, idk
+          xAfter = getCaretCoordinates().x
         }
       }
     }
@@ -116,9 +115,41 @@ function Row({ placeholder, posIdx, addRows }) {
         range.setEnd(lastNode, lastNode.length)
         document.getSelection().addRange(range)
         // END putting
-        const xAfter = getCaretCoordinates().x
+        let xAfter = getCaretCoordinates().x
+        let i = lastNode.length
+        let currentNode = lastNode
         console.log({xBefore, xAfter})
-        if (!isInDiapason(xBefore, xAfter, 6)) console.log('not in diap')
+        while (!isInDiapason(xBefore, xAfter, 6)) {
+          let fittingRange = document.getSelection().getRangeAt(0)
+          --i
+          // handle basic case - one node
+          if (i <= currentNode.length && i >= 0) {
+            fittingRange.setStart(currentNode, i)
+            fittingRange.setEnd(currentNode, i)
+            document.getSelection().addRange(fittingRange)
+            // if there is more than one node
+          } else {
+            // go up until there is place to move
+            while (!currentNode.previousSibling) {
+              currentNode = currentNode.parentNode
+            }
+            currentNode = currentNode.previousSibling
+            // move right (to the last node) when possible (Iqwe I BzxcB situation, we need to go to BzxcB first)
+            if (currentNode.nodeType === 1) {
+              currentNode = currentNode.firstChild
+              while (currentNode.nextSibling) {
+                currentNode = currentNode.nextSibling
+              }
+            }
+            // if necessary, go down (deeper)
+            while (currentNode.nodeType !== 3) {
+              currentNode = currentNode.firstChild
+            }
+            i = currentNode.length
+          }
+
+          xAfter = getCaretCoordinates().x
+        }
       }
     }
 
