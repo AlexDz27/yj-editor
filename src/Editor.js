@@ -118,7 +118,6 @@ function Row({ placeholder, posIdx, addRows }) {
         let xAfter = getCaretCoordinates().x
         let i = lastNode.length
         let currentNode = lastNode
-        console.log({xBefore, xAfter})
         while (!isInDiapason(xBefore, xAfter, 6)) {
           let fittingRange = document.getSelection().getRangeAt(0)
           --i
@@ -150,6 +149,49 @@ function Row({ placeholder, posIdx, addRows }) {
 
           xAfter = getCaretCoordinates().x
         }
+      }
+    }
+
+    if (e.key === 'ArrowRight' && !e.shiftKey) {
+      if (isCaretOnLastLine(ref.current) && ref.current.nextSibling) {
+        const xBefore = getCaretCoordinates().x
+        setTimeout(() => {
+          const xAfter = getCaretCoordinates().x
+          if (xBefore === xAfter) {
+            // putting
+            document.getSelection().removeAllRanges()
+            let range = new Range()
+            let firstNode = ref.current.nextSibling.firstChild // might be textNode or regularNode. The goal is textNode
+            while (firstNode.nodeType !== 3) {
+              firstNode = firstNode.firstChild
+            }
+            range.setStart(firstNode, 0)
+            range.setEnd(firstNode, 0)
+            document.getSelection().addRange(range)
+            // END putting
+          }
+        }, 50)
+      }
+    }
+    if (e.key === 'ArrowLeft' && !e.shiftKey) {
+      if (isCaretOnFirstLine(ref.current) && ref.current.previousSibling) {
+        const xBefore = getCaretCoordinates().x
+        setTimeout(() => {
+          const xAfter = getCaretCoordinates().x
+          if (xBefore === xAfter) {
+            // putting
+            document.getSelection().removeAllRanges()
+            let range = new Range()
+            let lastNode = ref.current.previousSibling.lastChild // might be textNode or regularNode. The goal is textNode
+            while (lastNode.nodeType !== 3) {
+              lastNode = lastNode.firstChild
+            }
+            range.setStart(lastNode, lastNode.length)
+            range.setEnd(lastNode, lastNode.length)
+            document.getSelection().addRange(range)
+            // END putting
+          }
+        }, 50)
       }
     }
 
