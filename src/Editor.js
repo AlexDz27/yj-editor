@@ -81,8 +81,8 @@ function Row({ placeholder, posIdx, addRows }) {
             while (!currentNode.nextSibling) {
               currentNode = currentNode.parentNode
             }
-            // move (edge case in if - ooooooooo| and ooo| situation)
-            if (currentNode.id === 'root') {
+            // move (edge case in if - ooooooooo| and ooo| situation). This if was written bc I have flaws in arch, i just wanted a quick patch
+            if (currentNode.id === 'root' || currentNode.classList && currentNode.classList.contains('row')) {
               return
             }
             currentNode = currentNode.nextSibling
