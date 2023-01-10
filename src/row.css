@@ -16,12 +16,25 @@
 .dragHandler {
   position: absolute;
   top: calc(50% - 6.5px);
-  left: -18px;
-  width: 13px;
+  left: -24px;
+  width: 20px;
   height: 13px;
-  background-color: grey;
+  background-color: transparent;
   cursor: grab;
+  border: none;
+  padding: 0;
+  display: none;
 }
 .dragHandler:active {
   cursor: grabbing;
+}
+.dragHandlerBar {
+  width: 20px;
+  height: 2px;
+  background-color: rgba(0, 0, 0, .6);
+  margin-bottom: 5px;
+}
+
+.dib {
+  display: inline-block;
 }

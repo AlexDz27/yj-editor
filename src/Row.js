@@ -57,7 +57,10 @@ function Row({ placeholder, posIdx, addRows }) {
 
   return (
     <div className="outerRow">
-      <span className="dragHandler"></span>
+      <button className={'dragHandler ' + (isBeingEdited ? 'dib' : '')}>
+        <div className="dragHandlerBar"></div>
+        <div className="dragHandlerBar"></div>
+      </button>
       <div
         ref={ref}
         contentEditable="true"
@@ -76,7 +79,10 @@ function Row({ placeholder, posIdx, addRows }) {
           setIsBeingEdited(false)
           unsetBackground()
         }}
-        onClick={unsetBackground}
+        onClick={() => {
+          unsetBackground()
+          setIsBeingEdited(true)
+        }}
         onPaste={(e) => {
           e.preventDefault()
           const text = e.clipboardData.getData('text/plain')
