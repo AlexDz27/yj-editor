@@ -82,7 +82,7 @@ function Row({ placeholder, posIdx, addRows }) {
               currentNode = currentNode.parentNode
             }
             // move (edge case in if - ooooooooo| and ooo| situation). This if was written bc I have flaws in arch, i just wanted a quick patch
-            if (currentNode.id === 'root' || currentNode.classList && currentNode.classList.contains('row')) {
+            if (currentNode.classList && currentNode.classList.contains('row') || currentNode.id === 'root') {
               return
             }
             currentNode = currentNode.nextSibling
@@ -134,6 +134,26 @@ function Row({ placeholder, posIdx, addRows }) {
               currentNode = currentNode.parentNode
             }
             currentNode = currentNode.previousSibling
+            if (currentNode.nodeName === 'H3' || currentNode.classList && currentNode.classList.contains('row')) {
+              // putting
+              document.getSelection().removeAllRanges()
+              let range = new Range()
+              let lastNode = ref.current.previousSibling.lastChild // might be textNode or regularNode. The goal is textNode
+              while (lastNode.nodeType !== 3) {
+                lastNode = lastNode.firstChild
+                while (lastNode.nextSibling) {
+                  lastNode = lastNode.nextSibling
+                }
+                while (lastNode.nodeType !== 3) {
+                  lastNode = lastNode.firstChild
+                }
+              }
+              range.setStart(lastNode, lastNode.length)
+              range.setEnd(lastNode, lastNode.length)
+              document.getSelection().addRange(range)
+              // END putting
+              return
+            }
             // move right (to the last node) when possible (Iqwe I BzxcB situation, we need to go to BzxcB first)
             if (currentNode.nodeType === 1) {
               currentNode = currentNode.firstChild
