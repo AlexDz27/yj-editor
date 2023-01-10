@@ -1,3 +1,7 @@
+.outerRow {
+  position: relative;
+}
+
 .row {
   margin-bottom: 20px;
   padding-top: 4px;
@@ -7,4 +11,17 @@
 }
 .row:focus-visible {
   outline: none;
+}
+
+.dragHandler {
+  position: absolute;
+  top: calc(50% - 6.5px);
+  left: -18px;
+  width: 13px;
+  height: 13px;
+  background-color: grey;
+  cursor: grab;
+}
+.dragHandler:active {
+  cursor: grabbing;
 }
