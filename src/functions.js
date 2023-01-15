@@ -1,3 +1,5 @@
+import { LEFT_EXTREME_EDGE_POINT, PERFECT_DIAPASON_FOR_CHARS } from './constants'
+
 export function getCaretIndex(element) {
   let position = 0;
   const isSupported = typeof window.getSelection !== "undefined";
@@ -104,14 +106,14 @@ export function getCaretCoordinates() {
         y = rect.top;
         // probably i should write else bc bug w/ ceditable - if no content, rect is undefined
       } else {
-        x = 167 // left extreme edge point
+        x = LEFT_EXTREME_EDGE_POINT
       }
     }
   }
   return { x, y };
 }
 
-export function isInDiapason(value1, value2, diapason) {
+export function isInDiapason(value1, value2, diapason = PERFECT_DIAPASON_FOR_CHARS) {
   let delta = value1 - value2
   if (Math.abs(delta) < diapason) return true
   return false

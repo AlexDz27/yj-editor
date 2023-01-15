@@ -1,14 +1,9 @@
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
-import { isCaretOnFirstLine, isCaretOnLastLine } from './functions'
+import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, isInDiapason } from './functions'
+import { NAV_BEHAVIOR, TEXT_NODE_TYPE } from './constants'
 
-const BEHAVIOR = {
-  SINGLE_LINE: 'SINGLE_LINE',
-  MULTILINE_WITH_BR: 'MULTILINE_WITH_BR',
-  MULTILINE: 'MULTILINE'
-}
-
-function Row({ posIdx, placeholder, isActive, addRows, setActive }) {
+function Row({ posIdx, placeholder, isActive, xBeforeRemembered, addRows, setActive, rememberXBefore }) {
   const ref = useRef(null)
   const [isHighlighted, setIsHighlighted] = useState(false)
 
@@ -21,6 +16,7 @@ function Row({ posIdx, placeholder, isActive, addRows, setActive }) {
     if (e.key === 'ArrowUp') {
       if (isCaretOnFirstLine(ref.current)) {
         e.preventDefault()
+        rememberXBefore(getCaretCoordinates().x)
         setActive(posIdx - 1)
       }
     }
@@ -28,6 +24,7 @@ function Row({ posIdx, placeholder, isActive, addRows, setActive }) {
     if (e.key === 'ArrowDown') {
       if (isCaretOnLastLine(ref.current)) {
         e.preventDefault()
+        rememberXBefore(getCaretCoordinates().x)
         setActive(posIdx + 1)
       }
     }
@@ -40,24 +37,97 @@ function Row({ posIdx, placeholder, isActive, addRows, setActive }) {
       // Arrow navigation logic start
       let behavior
       if (isCaretOnFirstLine(ref.current) && isCaretOnLastLine(ref.current)) {
-        behavior = BEHAVIOR.SINGLE_LINE
+        behavior = NAV_BEHAVIOR.SINGLE_LINE
       } else if (ref.current.querySelector('br')) {
-        behavior = BEHAVIOR.MULTILINE_WITH_BR
+        behavior = NAV_BEHAVIOR.MULTILINE_WITH_BR
       } else {
-        behavior = BEHAVIOR.MULTILINE
+        behavior = NAV_BEHAVIOR.MULTILINE
       }
 
+      const xBefore = xBeforeRemembered.current
+      let xAfter = getCaretCoordinates().x
+      let currentIteratingNode
       switch (behavior) {
-        case BEHAVIOR.SINGLE_LINE:
+        case NAV_BEHAVIOR.SINGLE_LINE:
           console.log('single-line')
+          // put caret at last char
+          document.getSelection().removeAllRanges()
+          let range = new Range()
+          let lastNode = ref.current.lastChild
+          while (lastNode.nodeType !== TEXT_NODE_TYPE) {
+            lastNode = lastNode.firstChild
+          }
+          range.setStart(lastNode, lastNode.length)
+          range.setEnd(lastNode, lastNode.length)
+          document.getSelection().addRange(range)
+
+          // if there is space, adjust (multiline behavior)
+          // TODO: rename...
+          let caretPos2 = lastNode.length
+          while (!isInDiapason(xBefore, xAfter)) {
+            let adjustingRange = document.getSelection().getRangeAt(0)
+            caretPos2--
+            // handle basic case - one node
+            if (caretPos2 >= 0) {
+              adjustingRange.setStart(lastNode, caretPos2)
+              adjustingRange.setEnd(lastNode, caretPos2)
+              document.getSelection().addRange(adjustingRange)
+            // if there is more than one node
+            } else {
+              // if necessary to go up, go up until there is place to move
+              while (!lastNode.previousSibling) {
+                lastNode = lastNode.parentNode
+              }
+              // move
+              // TODO: что насчет BIqweI zxcB?
+              lastNode = lastNode.previousSibling
+              // if necessary, go down (deeper)
+              while (lastNode.nodeType !== TEXT_NODE_TYPE) {
+                lastNode = lastNode.firstChild
+              }
+              caretPos2 = lastNode.length
+            }
+
+            xAfter = getCaretCoordinates().x
+          }
           break;
 
-        case BEHAVIOR.MULTILINE_WITH_BR:
+        case NAV_BEHAVIOR.MULTILINE_WITH_BR:
           console.log('multiline with br')
           break;
 
-        case BEHAVIOR.MULTILINE:
+        case NAV_BEHAVIOR.MULTILINE:
           console.log('multiline')
+          currentIteratingNode = ref.current.firstChild
+          while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
+            currentIteratingNode = currentIteratingNode.firstChild
+          }
+          let caretPos = 0
+          while (!isInDiapason(xBefore, xAfter)) {
+            let adjustingRange = document.getSelection().getRangeAt(0)
+            caretPos++
+            // handle basic case - one node
+            if (caretPos < currentIteratingNode.length) {
+              adjustingRange.setStart(currentIteratingNode, caretPos)
+              adjustingRange.setEnd(currentIteratingNode, caretPos)
+              document.getSelection().addRange(adjustingRange)
+            // if there is more than one node
+            } else {
+              // if necessary to go up, go up until there is place to move
+              while (!currentIteratingNode.nextSibling) {
+                currentIteratingNode = currentIteratingNode.parentNode
+              }
+              // move
+              currentIteratingNode = currentIteratingNode.nextSibling
+              // if necessary, go down (deeper)
+              while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
+                currentIteratingNode = currentIteratingNode.firstChild
+              }
+              caretPos = 0
+            }
+
+            xAfter = getCaretCoordinates().x
+          }
           break;
 
         default:

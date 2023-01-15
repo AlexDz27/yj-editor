@@ -1,8 +1,13 @@
 import './editor.css'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Row from './Row'
+import { LEFT_EXTREME_EDGE_POINT } from './constants'
 
 function Editor() {
+  let xBeforeRemembered = useRef(LEFT_EXTREME_EDGE_POINT)
+  function rememberXBefore(xBefore) {
+    xBeforeRemembered.current = xBefore
+  }
   let [rows, setRows] = useState([
     {
       posIdx: 0,
@@ -71,8 +76,10 @@ function Editor() {
           posIdx={posIdx}
           placeholder={placeholder}
           isActive={isActive}
+          xBeforeRemembered={xBeforeRemembered}
           addRows={addRows}
           setActive={setActive}
+          rememberXBefore={rememberXBefore}
         />
       ))}
     </section>
