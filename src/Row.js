@@ -1,7 +1,7 @@
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
 
-function Row({ posIdx, placeholder, isCurrentlyActive, addRows, setCurrentlyActive }) {
+function Row({ posIdx, placeholder, isActive, addRows, setCurrentlyActive }) {
   const ref = useRef(null)
   const [isHovered, setIsHovered] = useState(false)
 
@@ -13,12 +13,12 @@ function Row({ posIdx, placeholder, isCurrentlyActive, addRows, setCurrentlyActi
   }
 
   useEffect(() => {
-    if (isCurrentlyActive) ref.current.focus()
-  }, [isCurrentlyActive])
+    if (isActive) ref.current.focus()
+  }, [isActive])
 
   return (
     <div className="outerRow">
-      <button className={'dragHandler ' + (isCurrentlyActive ? 'dib' : '')}>
+      <button className={'dragHandler ' + (isActive ? 'dib' : '')}>
         <div className="dragHandlerBar"></div>
         <div className="dragHandlerBar"></div>
       </button>
