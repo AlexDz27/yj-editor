@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 
 function Row({ posIdx, placeholder, isActive, addRows, setCurrentlyActive }) {
   const ref = useRef(null)
-  const [isHovered, setIsHovered] = useState(false)
+  const [isHighlighted, setIsHighlighted] = useState(false)
 
   function handleEnter(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -28,13 +28,23 @@ function Row({ posIdx, placeholder, isActive, addRows, setCurrentlyActive }) {
         suppressContentEditableWarning="true"
         onKeyDown={handleEnter}
         onFocus={() => setCurrentlyActive(posIdx)}
+        onMouseEnter={() => {
+          if (isActive) {
+            setIsHighlighted(false)
+            return
+          }
+
+          setIsHighlighted(true)
+        }}
+        onMouseLeave={() => setIsHighlighted(false)}
+        onClick={() => setIsHighlighted(false)}
         onPaste={(e) => {
           e.preventDefault()
           const text = e.clipboardData.getData('text/plain')
           document.execCommand('insertText', false, text)
         }}
         className="row"
-        style={{ backgroundColor: isHovered ? '#f0f0f0' : 'initial' }}
+        style={{ backgroundColor: isHighlighted ? '#f0f0f0' : 'initial' }}
       >
         {placeholder}
       </div>
