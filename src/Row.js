@@ -1,5 +1,5 @@
 import './row.css'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 function Row({ posIdx, placeholder, isCurrentlyActive, addRows, setCurrentlyActive }) {
   const ref = useRef(null)
@@ -11,6 +11,10 @@ function Row({ posIdx, placeholder, isCurrentlyActive, addRows, setCurrentlyActi
       addRows(posIdx)
     }
   }
+
+  useEffect(() => {
+    if (isCurrentlyActive) ref.current.focus()
+  }, [isCurrentlyActive])
 
   return (
     <div className="outerRow">
