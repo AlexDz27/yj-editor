@@ -8,7 +8,7 @@ function Editor() {
       posIdx: 0,
       id: 0,
       placeholder: 'Write something... 123 123sdak kasdsa ksakd askkas ka skdksakda skd sk dasdaks da ks 123u 12u312 u321u3 12u83 12u3 128u3 21u3 12u3 12u12u8',
-      isActive: false,
+      isActive: true,
     },
     {
       posIdx: 1,
@@ -20,7 +20,7 @@ function Editor() {
       posIdx: 2,
       id: 2,
       placeholder: '123123123 123123 123 1312 12',
-      isActive: true,
+      isActive: false,
     },
     {
       posIdx: 3,

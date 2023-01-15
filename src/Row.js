@@ -2,6 +2,12 @@ import './row.css'
 import { useEffect, useRef, useState } from 'react'
 import { isCaretOnFirstLine, isCaretOnLastLine } from './functions'
 
+const BEHAVIOR = {
+  SINGLE_LINE: 'SINGLE_LINE',
+  MULTILINE_WITH_BR: 'MULTILINE_WITH_BR',
+  MULTILINE: 'MULTILINE'
+}
+
 function Row({ posIdx, placeholder, isActive, addRows, setActive }) {
   const ref = useRef(null)
   const [isHighlighted, setIsHighlighted] = useState(false)
@@ -28,9 +34,36 @@ function Row({ posIdx, placeholder, isActive, addRows, setActive }) {
   }
 
   useEffect(() => {
-    if (isActive) ref.current.focus()
+    if (isActive) {
+      ref.current.focus()
 
-    // TODO: impl
+      // Arrow navigation logic start
+      let behavior
+      if (isCaretOnFirstLine(ref.current) && isCaretOnLastLine(ref.current)) {
+        behavior = BEHAVIOR.SINGLE_LINE
+      } else if (ref.current.querySelector('br')) {
+        behavior = BEHAVIOR.MULTILINE_WITH_BR
+      } else {
+        behavior = BEHAVIOR.MULTILINE
+      }
+
+      switch (behavior) {
+        case BEHAVIOR.SINGLE_LINE:
+          console.log('single-line')
+          break;
+
+        case BEHAVIOR.MULTILINE_WITH_BR:
+          console.log('multiline with br')
+          break;
+
+        case BEHAVIOR.MULTILINE:
+          console.log('multiline')
+          break;
+
+        default:
+          console.error('Unknown behavior')
+      }
+    }
   }, [isActive])
 
   return (
