@@ -14,13 +14,13 @@ function Editor() {
       posIdx: 1,
       id: 1,
       placeholder: 'qweqwe 123',
-      isCurrentlyActive: true,
+      isCurrentlyActive: false,
     },
     {
       posIdx: 2,
       id: 2,
       placeholder: 'qweqwe 123 4324',
-      isCurrentlyActive: false,
+      isCurrentlyActive: true,
     },
     {
       posIdx: 3,
@@ -29,31 +29,38 @@ function Editor() {
       isCurrentlyActive: false,
     },
   ])
-  function setCurrentlyActive(id) {
+  function setCurrentlyActive(posIdx) {
     const rowsToUpdate = [...rows]
     rowsToUpdate.find(r => r.isCurrentlyActive === true).isCurrentlyActive = false
-    rowsToUpdate.find(r => r.id === id).isCurrentlyActive = true
+    rowsToUpdate.find(r => r.posIdx === posIdx).isCurrentlyActive = true
     const updatedRows = rowsToUpdate
     setRows(updatedRows)
   }
   function addRows(posIdx) {
-    setRows([
-      ...rows.slice(0, posIdx),
-      {
-        id: String(Math.random()),
-        isCurrentlyActive: false,
-      },
-      ...rows.slice(posIdx)
-    ])
+    rows.find(r => r.isCurrentlyActive === true).isCurrentlyActive = false
+
+    const firstHalf = [...rows.slice(0, posIdx + 1)]
+    const newRowToInsert = {
+      id: String(Math.random()),
+      isCurrentlyActive: true,
+      posIdx: posIdx + 1
+    }
+    const secondHalf = [...rows.slice(posIdx + 1)]
+    for (const row of secondHalf) {
+      row.posIdx++
+    }
+
+    const mergedHalvesWithNewRow = firstHalf.concat(newRowToInsert, secondHalf)
+    setRows(mergedHalvesWithNewRow)
   }
 
   return (
     <section className="editor">
-      {rows.map(({posIdx, id, placeholder, isCurrentlyActive}, i) => (
+      {rows.map(({posIdx, id, placeholder, isCurrentlyActive}) => (
         <Row
           key={id}
           id={id}
-          posIdx={i}
+          posIdx={posIdx}
           placeholder={placeholder}
           isCurrentlyActive={isCurrentlyActive}
           addRows={addRows}

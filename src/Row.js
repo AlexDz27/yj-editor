@@ -1,9 +1,16 @@
 import './row.css'
 import { useRef, useState } from 'react'
 
-function Row({ id, placeholder, isCurrentlyActive, setCurrentlyActive }) {
+function Row({ posIdx, placeholder, isCurrentlyActive, addRows, setCurrentlyActive }) {
   const ref = useRef(null)
   const [isHovered, setIsHovered] = useState(false)
+
+  function handleEnter(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      addRows(posIdx)
+    }
+  }
 
   return (
     <div className="outerRow">
@@ -15,7 +22,8 @@ function Row({ id, placeholder, isCurrentlyActive, setCurrentlyActive }) {
         ref={ref}
         contentEditable="true"
         suppressContentEditableWarning="true"
-        onFocus={() => setCurrentlyActive(id)}
+        onKeyDown={handleEnter}
+        onFocus={() => setCurrentlyActive(posIdx)}
         onPaste={(e) => {
           e.preventDefault()
           const text = e.clipboardData.getData('text/plain')
