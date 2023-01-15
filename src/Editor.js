@@ -36,6 +36,8 @@ function Editor() {
     },
   ])
   function setActive(posIdx) {
+    if (!rows.find(r => r.posIdx === posIdx)) return
+
     const rowsToUpdate = [...rows]
     rowsToUpdate.find(r => r.isActive === true).isActive = false
     rowsToUpdate.find(r => r.posIdx === posIdx).isActive = true

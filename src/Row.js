@@ -1,19 +1,36 @@
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
+import { isCaretOnFirstLine, isCaretOnLastLine } from './functions'
 
 function Row({ posIdx, placeholder, isActive, addRows, setActive }) {
   const ref = useRef(null)
   const [isHighlighted, setIsHighlighted] = useState(false)
 
-  function handleEnter(e) {
+  function handleEnterAndArrows(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       addRows(posIdx)
+    }
+
+    if (e.key === 'ArrowUp') {
+      if (isCaretOnFirstLine(ref.current)) {
+        e.preventDefault()
+        setActive(posIdx - 1)
+      }
+    }
+
+    if (e.key === 'ArrowDown') {
+      if (isCaretOnLastLine(ref.current)) {
+        e.preventDefault()
+        setActive(posIdx + 1)
+      }
     }
   }
 
   useEffect(() => {
     if (isActive) ref.current.focus()
+
+    // TODO: impl
   }, [isActive])
 
   return (
@@ -26,7 +43,7 @@ function Row({ posIdx, placeholder, isActive, addRows, setActive }) {
         ref={ref}
         contentEditable="true"
         suppressContentEditableWarning="true"
-        onKeyDown={handleEnter}
+        onKeyDown={handleEnterAndArrows}
         onFocus={() => setActive(posIdx)}
         onMouseEnter={() => {
           if (isActive) {
