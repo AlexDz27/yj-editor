@@ -1,7 +1,7 @@
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
 
-function Row({ posIdx, placeholder, isActive, addRows, setCurrentlyActive }) {
+function Row({ posIdx, placeholder, isActive, addRows, setActive }) {
   const ref = useRef(null)
   const [isHighlighted, setIsHighlighted] = useState(false)
 
@@ -27,7 +27,7 @@ function Row({ posIdx, placeholder, isActive, addRows, setCurrentlyActive }) {
         contentEditable="true"
         suppressContentEditableWarning="true"
         onKeyDown={handleEnter}
-        onFocus={() => setCurrentlyActive(posIdx)}
+        onFocus={() => setActive(posIdx)}
         onMouseEnter={() => {
           if (isActive) {
             setIsHighlighted(false)
