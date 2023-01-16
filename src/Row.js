@@ -1,6 +1,6 @@
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
-import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, isInDiapason, putCaretAtEndOfElement } from './functions'
+import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, isInDiapason, putCaretAtEndOfElement, putCaretAtStartOfElement } from './functions'
 import { NAV_BEHAVIOR, TEXT_NODE_TYPE } from './constants'
 
 function Row({ posIdx, placeholder, isActive, xBeforeRemembered, addRows, setActive, rememberXBefore }) {
@@ -55,6 +55,8 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, addRows, setAct
           xAfter = getCaretCoordinates().x
           if (xBefore > xAfter) return
 
+          putCaretAtStartOfElement(ref.current)
+          xAfter = getCaretCoordinates().x
           currentIteratingNode = ref.current.firstChild
           while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
             currentIteratingNode = currentIteratingNode.firstChild
@@ -72,20 +74,24 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, addRows, setAct
             } else {
               // if necessary to go up, go up until there is place to move
               while (!currentIteratingNode.nextSibling) {  // TODO: ( я тут почему-то предполагаю что всегда есть nextSibling
-                debugger
+                // debugger
                 currentIteratingNode = currentIteratingNode.parentNode
               }
-              debugger
+              // debugger
               console.log({firstMove: currentIteratingNode})
               // move
               currentIteratingNode = currentIteratingNode.nextSibling
               console.log({secondMove: currentIteratingNode})
-              debugger
+              // debugger
               // if necessary, go down (deeper)
               if (!currentIteratingNode) {
                 debugger
               }
+              if (currentIteratingNode === null) {
+                debugger
+              }
               // debugger
+              if (!currentIteratingNode) return
               while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
                 currentIteratingNode = currentIteratingNode.firstChild
               }

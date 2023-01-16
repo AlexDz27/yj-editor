@@ -1,5 +1,17 @@
 import { LEFT_EXTREME_EDGE_POINT, PERFECT_DIAPASON_FOR_CHARS } from './constants'
 
+export function putCaretAtStartOfElement(el) {
+  document.getSelection().removeAllRanges()
+  let range = new Range()
+  let firstNode = el.firstChild // might be textNode or regularNode. The goal is textNode
+  while (firstNode.nodeType !== 3) {
+    firstNode = firstNode.firstChild
+  }
+  range.setStart(firstNode, 0)
+  range.setEnd(firstNode, 0)
+  document.getSelection().addRange(range)
+}
+
 export function putCaretAtEndOfElement(el) {
   document.getSelection().removeAllRanges()
   let range = new Range()

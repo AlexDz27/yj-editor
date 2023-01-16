@@ -13,13 +13,13 @@ function Editor() {
       posIdx: 0,
       id: 0,
       placeholder: 'Write something... 123 123sdak kasdsa ksakd askkas ka skdksakda skd sk dasdaks da ks 123u 12u312 u321u3 12u83 12u3 128u3 21u3 12u3 12u12u8',
-      isActive: true,
+      isActive: false,
     },
     {
       posIdx: 1,
       id: 1,
       placeholder: 'qwe qwe kqwek qwk ewkwqke kqw kqwek qwk eqwek kaskdkas ak ask dsakask ksa kkwqk ksadaksd kask ask saksak askdwqk1 123 123 123 21 j213 1230 12 j2 i3j31i j',
-      isActive: false,
+      isActive: true,
     },
     {
       posIdx: 2,
@@ -42,6 +42,7 @@ function Editor() {
   ])
   function setActive(posIdx) {
     if (!rows.find(r => r.posIdx === posIdx)) return
+    // if (rows.find(r => r.posIdx === posIdx).isActive === true) return
 
     const rowsToUpdate = [...rows]
     rowsToUpdate.find(r => r.isActive === true).isActive = false
