@@ -1,6 +1,6 @@
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
-import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, isInDiapason } from './functions'
+import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, isInDiapason, putCaretAtEndOfElement } from './functions'
 import { NAV_BEHAVIOR, TEXT_NODE_TYPE } from './constants'
 
 function Row({ posIdx, placeholder, isActive, xBeforeRemembered, addRows, setActive, rememberXBefore }) {
@@ -50,42 +50,46 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, addRows, setAct
       switch (behavior) {
         case NAV_BEHAVIOR.SINGLE_LINE:
           console.log('single-line')
-          // put caret at last char
-          document.getSelection().removeAllRanges()
-          let range = new Range()
-          let lastNode = ref.current.lastChild
-          while (lastNode.nodeType !== TEXT_NODE_TYPE) {
-            lastNode = lastNode.firstChild
-          }
-          range.setStart(lastNode, lastNode.length)
-          range.setEnd(lastNode, lastNode.length)
-          document.getSelection().addRange(range)
 
-          // if there is space, adjust (multiline behavior)
-          // TODO: rename...
-          let caretPos2 = lastNode.length
+          putCaretAtEndOfElement(ref.current)
+          xAfter = getCaretCoordinates().x
+          if (xBefore > xAfter) return
+
+          currentIteratingNode = ref.current.firstChild
+          while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
+            currentIteratingNode = currentIteratingNode.firstChild
+          }
+          let caretPos2 = 0
           while (!isInDiapason(xBefore, xAfter)) {
             let adjustingRange = document.getSelection().getRangeAt(0)
-            caretPos2--
+            caretPos2++
             // handle basic case - one node
-            if (caretPos2 >= 0) {
-              adjustingRange.setStart(lastNode, caretPos2)
-              adjustingRange.setEnd(lastNode, caretPos2)
+            if (caretPos2 < currentIteratingNode.length) {
+              adjustingRange.setStart(currentIteratingNode, caretPos2)
+              adjustingRange.setEnd(currentIteratingNode, caretPos2)
               document.getSelection().addRange(adjustingRange)
             // if there is more than one node
             } else {
               // if necessary to go up, go up until there is place to move
-              while (!lastNode.previousSibling) {
-                lastNode = lastNode.parentNode
+              while (!currentIteratingNode.nextSibling) {  // TODO: ( я тут почему-то предполагаю что всегда есть nextSibling
+                debugger
+                currentIteratingNode = currentIteratingNode.parentNode
               }
+              debugger
+              console.log({firstMove: currentIteratingNode})
               // move
-              // TODO: что насчет BIqweI zxcB?
-              lastNode = lastNode.previousSibling
+              currentIteratingNode = currentIteratingNode.nextSibling
+              console.log({secondMove: currentIteratingNode})
+              debugger
               // if necessary, go down (deeper)
-              while (lastNode.nodeType !== TEXT_NODE_TYPE) {
-                lastNode = lastNode.firstChild
+              if (!currentIteratingNode) {
+                debugger
               }
-              caretPos2 = lastNode.length
+              // debugger
+              while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
+                currentIteratingNode = currentIteratingNode.firstChild
+              }
+              caretPos2 = 0
             }
 
             xAfter = getCaretCoordinates().x
@@ -115,6 +119,7 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, addRows, setAct
             } else {
               // if necessary to go up, go up until there is place to move
               while (!currentIteratingNode.nextSibling) {
+                console.log({'currentIteratingNode.parentNode': currentIteratingNode.parentNode})
                 currentIteratingNode = currentIteratingNode.parentNode
               }
               // move

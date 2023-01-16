@@ -1,5 +1,17 @@
 import { LEFT_EXTREME_EDGE_POINT, PERFECT_DIAPASON_FOR_CHARS } from './constants'
 
+export function putCaretAtEndOfElement(el) {
+  document.getSelection().removeAllRanges()
+  let range = new Range()
+  let lastNode = el.lastChild // might be textNode or regularNode. The goal is textNode
+  while (lastNode.nodeType !== 3) {
+    lastNode = lastNode.firstChild
+  }
+  range.setStart(lastNode, lastNode.length)
+  range.setEnd(lastNode, lastNode.length)
+  document.getSelection().addRange(range)
+}
+
 export function getCaretIndex(element) {
   let position = 0;
   const isSupported = typeof window.getSelection !== "undefined";
