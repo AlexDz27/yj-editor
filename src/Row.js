@@ -1,6 +1,6 @@
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
-import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, isInDiapason, putCaretAtEndOfElement, putCaretAtStartOfElement } from './functions'
+import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, isInDiapason } from './functions'
 import { NAV_BEHAVIOR, TEXT_NODE_TYPE } from './constants'
 
 function Row({ posIdx, placeholder, isActive, xBeforeRemembered, addRows, setActive, rememberXBefore }) {
@@ -51,11 +51,11 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, addRows, setAct
         case NAV_BEHAVIOR.SINGLE_LINE:
           console.log('single-line')
 
-          putCaretAtEndOfElement(ref.current)
-          xAfter = getCaretCoordinates().x
-          if (xBefore > xAfter) return
+          // putCaretAtEndOfElement(ref.current)
+          // xAfter = getCaretCoordinates().x
+          // if (xBefore > xAfter) return
 
-          putCaretAtStartOfElement(ref.current)
+          // putCaretAtStartOfElement(ref.current)
           xAfter = getCaretCoordinates().x
           currentIteratingNode = ref.current.firstChild
           while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
@@ -72,30 +72,8 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, addRows, setAct
               document.getSelection().addRange(adjustingRange)
             // if there is more than one node
             } else {
-              // if necessary to go up, go up until there is place to move
-              while (!currentIteratingNode.nextSibling) {  // TODO: ( я тут почему-то предполагаю что всегда есть nextSibling
-                // debugger
-                currentIteratingNode = currentIteratingNode.parentNode
-              }
-              // debugger
-              console.log({firstMove: currentIteratingNode})
-              // move
-              currentIteratingNode = currentIteratingNode.nextSibling
-              console.log({secondMove: currentIteratingNode})
-              // debugger
-              // if necessary, go down (deeper)
-              if (!currentIteratingNode) {
-                debugger
-              }
-              if (currentIteratingNode === null) {
-                debugger
-              }
-              // debugger
-              if (!currentIteratingNode) return
-              while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
-                currentIteratingNode = currentIteratingNode.firstChild
-              }
-              caretPos2 = 0
+              debugger
+              console.log(123)
             }
 
             xAfter = getCaretCoordinates().x
