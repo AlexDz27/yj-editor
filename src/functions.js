@@ -1,4 +1,76 @@
-import { LEFT_EXTREME_EDGE_POINT, PERFECT_DIAPASON_FOR_CHARS } from './constants'
+import { NAV_BEHAVIOR, TEXT_NODE_TYPE, LEFT_EXTREME_EDGE_POINT, PERFECT_DIAPASON_FOR_CHARS } from './constants'
+
+export function setCaretAccordingToPrevXCoord(element, prevXCoord) {
+  putCaretAtStartOfElement(element)
+
+  // Arrow navigation logic start
+  let behavior
+  if (isCaretOnFirstLine(element) && isCaretOnLastLine(element)) {
+    behavior = NAV_BEHAVIOR.SINGLE_LINE
+  } else if (element.querySelector('br')) {
+    behavior = NAV_BEHAVIOR.MULTILINE_WITH_BR
+  } else {
+    behavior = NAV_BEHAVIOR.MULTILINE
+  }
+
+  switch (behavior) {
+    // TODO: ( rewrite into MULTILINE_OR_SINGLE_LINE
+    case NAV_BEHAVIOR.MULTILINE:
+    case NAV_BEHAVIOR.SINGLE_LINE:
+      adjustCaret(element, prevXCoord)
+      break;
+    
+    case NAV_BEHAVIOR.MULTILINE_WITH_BR:
+      console.log('multiline with br')
+      console.log('TODO: implement multiline with br')
+      break;
+
+    default:
+      console.error('Unknown behavior')
+  }
+
+
+  function adjustCaret(element, xBefore) {
+    let xAfter = getCaretCoordinates().x
+    const lastChild = element.lastChild
+    let currentIteratingNode = element.firstChild
+
+    while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
+      currentIteratingNode = currentIteratingNode.firstChild
+    }
+    let caretPos = 0    
+    while (!isInDiapason(xBefore, xAfter)) {
+      let adjustingRange = document.getSelection().getRangeAt(0)
+      caretPos++
+      // handle basic case - one node
+      if (caretPos <= currentIteratingNode.length) {
+        adjustingRange.setStart(currentIteratingNode, caretPos)
+        adjustingRange.setEnd(currentIteratingNode, caretPos)
+        document.getSelection().addRange(adjustingRange)
+      // if there is more than one node
+      } else {
+        // EC when 'oooooooo'| and 'oooo'| or 'oooooo'| and B'oooo'B|
+        if (currentIteratingNode === lastChild || currentIteratingNode.parentNode === lastChild) return
+        
+        // if necessary to go up, go up until there is place to move
+        while (!currentIteratingNode.nextSibling) {
+          currentIteratingNode = currentIteratingNode.parentNode
+        }
+        // move
+        currentIteratingNode = currentIteratingNode.nextSibling
+        // if necessary, go down (deeper)
+        while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
+          currentIteratingNode = currentIteratingNode.firstChild
+        }
+        caretPos = 0
+      }
+
+      xAfter = getCaretCoordinates().x
+    }
+  }
+}
+
+
 
 export function putCaretAtStartOfElement(el) {
   document.getSelection().removeAllRanges()

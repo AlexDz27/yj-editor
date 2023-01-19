@@ -1,7 +1,6 @@
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
-import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, isInDiapason, putCaretAtStartOfElement } from './functions'
-import { NAV_BEHAVIOR, TEXT_NODE_TYPE } from './constants'
+import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, setCaretAccordingToPrevXCoord } from './functions'
 
 function Row({ posIdx, placeholder, isActive, xBeforeRemembered, wasUp, addRows, setActive, rememberXBefore }) {
   const isClicked = useRef(false)
@@ -45,102 +44,7 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, wasUp, addRows,
 
     //               isClicked prevents the logic from firing on click - that is undesirable 
     if (isActive && !isClicked.current) {
-      putCaretAtStartOfElement(ref.current)
-
-      // Arrow navigation logic start
-      let behavior
-      if (isCaretOnFirstLine(ref.current) && isCaretOnLastLine(ref.current)) {
-        behavior = NAV_BEHAVIOR.SINGLE_LINE
-      } else if (ref.current.querySelector('br')) {
-        behavior = NAV_BEHAVIOR.MULTILINE_WITH_BR
-      } else {
-        behavior = NAV_BEHAVIOR.MULTILINE
-      }
-
-      const xBefore = xBeforeRemembered.current
-      let xAfter = getCaretCoordinates().x
-      let currentIteratingNode
-      switch (behavior) {
-        case NAV_BEHAVIOR.SINGLE_LINE:
-          console.log('single-line')
-
-          const lastChild = ref.current.lastChild
-          currentIteratingNode = ref.current.firstChild
-          while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
-            currentIteratingNode = currentIteratingNode.firstChild
-          }
-          let caretPos2 = 0
-          while (!isInDiapason(xBefore, xAfter)) {
-            let adjustingRange = document.getSelection().getRangeAt(0)
-            caretPos2++
-            // handle basic case - one node
-            if (caretPos2 <= currentIteratingNode.length) {
-              adjustingRange.setStart(currentIteratingNode, caretPos2)
-              adjustingRange.setEnd(currentIteratingNode, caretPos2)
-              document.getSelection().addRange(adjustingRange)
-            // if there is more than one node
-            } else {
-              // EC when oooooooo| and oooo|
-              if (currentIteratingNode === lastChild) return
-
-              // if necessary to go up, go up until there is place to move
-              while (!currentIteratingNode.nextSibling) {
-                currentIteratingNode = currentIteratingNode.parentNode
-              }
-              // move
-              currentIteratingNode = currentIteratingNode.nextSibling
-              // if necessary, go down (deeper)
-              while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
-                currentIteratingNode = currentIteratingNode.firstChild
-              }
-              caretPos2 = 0
-            }
-
-            xAfter = getCaretCoordinates().x
-          }
-          break;
-
-        case NAV_BEHAVIOR.MULTILINE_WITH_BR:
-          console.log('multiline with br')
-          break;
-
-        case NAV_BEHAVIOR.MULTILINE:
-          console.log('multiline')
-          currentIteratingNode = ref.current.firstChild
-          while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
-            currentIteratingNode = currentIteratingNode.firstChild
-          }
-          let caretPos = 0
-          while (!isInDiapason(xBefore, xAfter)) {
-            let adjustingRange = document.getSelection().getRangeAt(0)
-            caretPos++
-            // handle basic case - one node
-            if (caretPos <= currentIteratingNode.length) {
-              adjustingRange.setStart(currentIteratingNode, caretPos)
-              adjustingRange.setEnd(currentIteratingNode, caretPos)
-              document.getSelection().addRange(adjustingRange)
-            // if there is more than one node
-            } else {
-              // if necessary to go up, go up until there is place to move
-              while (!currentIteratingNode.nextSibling) {
-                currentIteratingNode = currentIteratingNode.parentNode
-              }
-              // move
-              currentIteratingNode = currentIteratingNode.nextSibling
-              // if necessary, go down (deeper)
-              while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
-                currentIteratingNode = currentIteratingNode.firstChild
-              }
-              caretPos = 0
-            }
-
-            xAfter = getCaretCoordinates().x
-          }
-          break;
-
-        default:
-          console.error('Unknown behavior')
-      }
+      setCaretAccordingToPrevXCoord(ref.current, xBeforeRemembered.current)
     }
   }, [isActive])
 
