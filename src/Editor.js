@@ -5,11 +5,11 @@ import { LEFT_EXTREME_EDGE_POINT } from './constants'
 
 function Editor() {
   const wasUp = useRef(false)
-  let xBeforeRemembered = useRef(LEFT_EXTREME_EDGE_POINT)  // TODO: refactor to const (
+  const xBeforeRemembered = useRef(LEFT_EXTREME_EDGE_POINT)
   function rememberXBefore(xBefore) {
     xBeforeRemembered.current = xBefore
   }
-  let [rows, setRows] = useState([
+  const [rows, setRows] = useState([
     {
       posIdx: 0,
       id: 0,
