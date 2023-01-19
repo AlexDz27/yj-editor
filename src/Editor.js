@@ -4,7 +4,8 @@ import Row from './Row'
 import { LEFT_EXTREME_EDGE_POINT } from './constants'
 
 function Editor() {
-  let xBeforeRemembered = useRef(LEFT_EXTREME_EDGE_POINT)
+  const wasUp = useRef(false)
+  let xBeforeRemembered = useRef(LEFT_EXTREME_EDGE_POINT)  // TODO: refactor to const (
   function rememberXBefore(xBefore) {
     xBeforeRemembered.current = xBefore
   }
@@ -77,6 +78,7 @@ function Editor() {
           placeholder={placeholder}
           isActive={isActive}
           xBeforeRemembered={xBeforeRemembered}
+          wasUp={wasUp}
           addRows={addRows}
           setActive={setActive}
           rememberXBefore={rememberXBefore}

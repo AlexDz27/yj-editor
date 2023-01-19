@@ -3,12 +3,14 @@ import { useEffect, useRef, useState } from 'react'
 import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, isInDiapason, putCaretAtStartOfElement } from './functions'
 import { NAV_BEHAVIOR, TEXT_NODE_TYPE } from './constants'
 
-function Row({ posIdx, placeholder, isActive, xBeforeRemembered, addRows, setActive, rememberXBefore }) {
+function Row({ posIdx, placeholder, isActive, xBeforeRemembered, wasUp, addRows, setActive, rememberXBefore }) {
   const isClicked = useRef(false)
   const ref = useRef(null)
   const [isHighlighted, setIsHighlighted] = useState(false)
 
   function handleEnterAndArrows(e) {
+    wasUp.current = false
+
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       addRows(posIdx)
@@ -18,6 +20,7 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, addRows, setAct
       if (isCaretOnFirstLine(ref.current)) {
         e.preventDefault()
         rememberXBefore(getCaretCoordinates().x)
+        wasUp.current = true
         setActive(posIdx - 1)
       }
     }
