@@ -4,7 +4,7 @@ import Row from './Row'
 import { LEFT_EXTREME_EDGE_POINT } from './constants'
 
 function Editor() {
-  const wasUp = useRef(false)
+  const navIntentToGoUp = useRef(false)
   const xBeforeRemembered = useRef(LEFT_EXTREME_EDGE_POINT)
   function rememberXBefore(xBefore) {
     xBeforeRemembered.current = xBefore
@@ -78,7 +78,7 @@ function Editor() {
           placeholder={placeholder}
           isActive={isActive}
           xBeforeRemembered={xBeforeRemembered}
-          wasUp={wasUp}
+          navIntentToGoUp={navIntentToGoUp}
           addRows={addRows}
           setActive={setActive}
           rememberXBefore={rememberXBefore}

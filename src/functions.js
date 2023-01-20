@@ -33,11 +33,15 @@ export function setCaretAccordingToPrevXCoord(element, prevXCoord) {
   function adjustCaret(element, xBefore) {
     let xAfter = getCaretCoordinates().x
     const lastChild = element.lastChild
+    let lastChildTextNode = lastChild
+    while (lastChildTextNode.nodeType !== TEXT_NODE_TYPE) {
+      lastChildTextNode = lastChildTextNode.lastChild
+    }
     let currentIteratingNode = element.firstChild
-
     while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
       currentIteratingNode = currentIteratingNode.firstChild
     }
+
     let caretPos = 0    
     while (!isInDiapason(xBefore, xAfter)) {
       let adjustingRange = document.getSelection().getRangeAt(0)
@@ -49,13 +53,14 @@ export function setCaretAccordingToPrevXCoord(element, prevXCoord) {
         document.getSelection().addRange(adjustingRange)
       // if there is more than one node
       } else {
-        // EC when 'oooooooo'| and 'oooo'| or 'oooooo'| and B'oooo'B|
-        if (currentIteratingNode === lastChild || currentIteratingNode.parentNode === lastChild) return
-        
+        // exit out of logic if we reached the end of row
+        if (currentIteratingNode === lastChildTextNode) return
+
         // if necessary to go up, go up until there is place to move
         while (!currentIteratingNode.nextSibling) {
           currentIteratingNode = currentIteratingNode.parentNode
         }
+
         // move
         currentIteratingNode = currentIteratingNode.nextSibling
         // if necessary, go down (deeper)
@@ -70,13 +75,82 @@ export function setCaretAccordingToPrevXCoord(element, prevXCoord) {
   }
 }
 
+export function setCaretAccordingToPrevXCoordFromEnd(element, prevXCoord) {
+  putCaretAtEndOfElement(element)
 
+  // EC when [up] 'oooooooo'| and 'oooo'|
+  if (prevXCoord > getCaretCoordinates().x) return
+
+  // Arrow navigation logic start
+  let behavior
+  if (isCaretOnFirstLine(element) && isCaretOnLastLine(element)) {
+    behavior = NAV_BEHAVIOR.SINGLE_LINE
+  } else if (element.querySelector('br')) {
+    behavior = NAV_BEHAVIOR.MULTILINE_WITH_BR
+  } else {
+    behavior = NAV_BEHAVIOR.MULTILINE
+  }
+
+  switch (behavior) {
+    // TODO: ( rewrite into MULTILINE_OR_SINGLE_LINE
+    case NAV_BEHAVIOR.MULTILINE:
+    case NAV_BEHAVIOR.SINGLE_LINE:
+      adjustCaretFromEnd(element, prevXCoord)
+      break;
+    
+    case NAV_BEHAVIOR.MULTILINE_WITH_BR:
+      console.log('multiline with br')
+      console.log('TODO: implement multiline with br')
+      break;
+
+    default:
+      console.error('Unknown behavior')
+  }
+
+  function adjustCaretFromEnd(element, xBefore) {
+    let xAfter = getCaretCoordinates().x
+    const lastChild = element.lastChild
+    let currentIteratingNode = lastChild
+
+    while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
+      currentIteratingNode = currentIteratingNode.lastChild
+    }
+    let caretPos = currentIteratingNode.length
+    while (!isInDiapason(xBefore, xAfter)) {
+      let adjustingRange = document.getSelection().getRangeAt(0)
+      caretPos--
+      // handle basic case - one node
+      if (caretPos >= 0) {
+        adjustingRange.setStart(currentIteratingNode, caretPos)
+        adjustingRange.setEnd(currentIteratingNode, caretPos)
+        document.getSelection().addRange(adjustingRange)
+      // if there is more than one node (if we arrived at start of node)
+      } else {
+        while (!currentIteratingNode.previousSibling) {
+          currentIteratingNode = currentIteratingNode.parentNode
+        }
+
+        // move
+        currentIteratingNode = currentIteratingNode.previousSibling
+
+        // drill
+        while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
+          currentIteratingNode = currentIteratingNode.lastChild
+        }
+
+        caretPos = currentIteratingNode.length
+      }
+
+      xAfter = getCaretCoordinates().x
+    }
+  }
+}
 
 export function putCaretAtStartOfElement(el) {
   document.getSelection().removeAllRanges()
   let range = new Range()
   let firstNode = el.firstChild // might be textNode or regularNode. The goal is textNode
-  while (firstNode.nodeType !== 3) {
+  while (firstNode.nodeType !== TEXT_NODE_TYPE) {
     firstNode = firstNode.firstChild
   }
   range.setStart(firstNode, 0)
@@ -88,8 +162,8 @@ export function putCaretAtEndOfElement(el) {
   document.getSelection().removeAllRanges()
   let range = new Range()
   let lastNode = el.lastChild // might be textNode or regularNode. The goal is textNode
-  while (lastNode.nodeType !== 3) {
-    lastNode = lastNode.firstChild
+  while (lastNode.nodeType !== TEXT_NODE_TYPE) {
+    lastNode = lastNode.lastChild
   }
   range.setStart(lastNode, lastNode.length)
   range.setEnd(lastNode, lastNode.length)

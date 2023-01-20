@@ -1,14 +1,14 @@
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
-import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, setCaretAccordingToPrevXCoord } from './functions'
+import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, setCaretAccordingToPrevXCoord, setCaretAccordingToPrevXCoordFromEnd } from './functions'
 
-function Row({ posIdx, placeholder, isActive, xBeforeRemembered, wasUp, addRows, setActive, rememberXBefore }) {
+function Row({ posIdx, placeholder, isActive, xBeforeRemembered, navIntentToGoUp, addRows, setActive, rememberXBefore }) {
   const isClicked = useRef(false)
   const ref = useRef(null)
   const [isHighlighted, setIsHighlighted] = useState(false)
 
   function handleEnterAndArrows(e) {
-    wasUp.current = false
+    navIntentToGoUp.current = false
 
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -19,7 +19,7 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, wasUp, addRows,
       if (isCaretOnFirstLine(ref.current)) {
         e.preventDefault()
         rememberXBefore(getCaretCoordinates().x)
-        wasUp.current = true
+        navIntentToGoUp.current = true
         setActive(posIdx - 1)
       }
     }
@@ -44,7 +44,11 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, wasUp, addRows,
 
     //               isClicked prevents the logic from firing on click - that is undesirable 
     if (isActive && !isClicked.current) {
-      setCaretAccordingToPrevXCoord(ref.current, xBeforeRemembered.current)
+      if (navIntentToGoUp.current) {
+        setCaretAccordingToPrevXCoordFromEnd(ref.current, xBeforeRemembered.current)
+      } else {
+        setCaretAccordingToPrevXCoord(ref.current, xBeforeRemembered.current)
+      }
     }
   }, [isActive])
 
