@@ -77,9 +77,9 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, navIntentToGoUp
         }}
         onMouseLeave={() => setIsHighlighted(false)}
         onClick={() => {
-          isClicked.current = true
           setIsHighlighted(false)
         }}
+        onMouseDown={() => isClicked.current = true}
         onPaste={(e) => {
           e.preventDefault()
           const text = e.clipboardData.getData('text/plain')

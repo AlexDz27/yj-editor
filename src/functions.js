@@ -241,6 +241,17 @@ export function isCaretOnFirstLine(element) {
 
   let originalCaretRange = selection.getRangeAt(0)
 
+  // Ref #1
+  if (originalCaretRange.startContainer.nodeName === 'BR' && originalCaretRange.startContainer === element.firstChild) {
+    return true
+  }
+  if (originalCaretRange.startContainer.nodeName === 'BR' && element.lastChild.nodeName === 'BR') {
+    return false
+  }
+  if (originalCaretRange.startContainer === element && originalCaretRange.startOffset > 0) {
+    return false
+  }
+
   // Bail if there is text selected
   if (originalCaretRange.toString().length > 0) return false
 
@@ -274,6 +285,23 @@ export function isCaretOnLastLine(element) {
   if (selection.rangeCount === 0) return false
 
   let originalCaretRange = selection.getRangeAt(0)
+
+  // Ref #1
+  if (originalCaretRange.startContainer.nodeName === 'BR' && originalCaretRange.startContainer === element.lastChild) {
+    return true
+  }
+  if (originalCaretRange.startContainer.nodeName === 'BR') {
+    return false
+  }
+  if (originalCaretRange.startContainer === element && originalCaretRange.startOffset < element.children.length) {
+    // Ref #1.1
+    const regex = new RegExp('^(<br>)*$')
+    if (regex.test(element.innerHTML) && originalCaretRange.startOffset <= (element.children.length - 1)) {
+      return true
+    }
+
+    return false
+  }
 
   // Bail if there is a selection
   if (originalCaretRange.toString().length > 0) return false
