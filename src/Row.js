@@ -35,14 +35,13 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, navIntentToGoUp
 
   useEffect(() => {
     // EC: we are on last row, hit enter -> new row appears, but putCaret func doesn't work bc
-    // it needs a .firstChild. Or it does work, but maybe it's a row with a line break as first thing.
-    // Thus, we simply focus and return
-    if (isActive && (!ref.current.firstChild || ref.current.firstChild.nodeName === 'BR')) {
+    // it needs a .firstChild. Thus, we simply focus and return.
+    if (isActive && !ref.current.firstChild) {
       ref.current.focus()
       return
     }
 
-    //               isClicked prevents the logic from firing on click - that is undesirable 
+    //               isClicked prevents the logic from firing on click - that is undesirable
     if (isActive && !isClicked.current) {
       if (navIntentToGoUp.current) {
         setCaretAccordingToPrevXCoordFromEnd(ref.current, xBeforeRemembered.current)

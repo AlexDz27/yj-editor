@@ -1,6 +1,11 @@
 import { NAV_BEHAVIOR, TEXT_NODE_TYPE, LEFT_EXTREME_EDGE_POINT, PERFECT_DIAPASON_FOR_CHARS } from './constants'
 
 export function setCaretAccordingToPrevXCoord(element, prevXCoord) {
+  if (hasElementBrAsFirstOrLastNode(element)) {
+    handleBr(element)
+    return
+  }
+
   putCaretAtStartOfElement(element)
 
   // Arrow navigation logic start
@@ -76,6 +81,11 @@ export function setCaretAccordingToPrevXCoord(element, prevXCoord) {
 }
 
 export function setCaretAccordingToPrevXCoordFromEnd(element, prevXCoord) {
+  if (hasElementBrAsFirstOrLastNode(element)) {
+    handleBrFromEnd(element)
+    return
+  }
+
   putCaretAtEndOfElement(element)
 
   // EC when [up] 'oooooooo'| and 'oooo'|
@@ -146,6 +156,33 @@ export function setCaretAccordingToPrevXCoordFromEnd(element, prevXCoord) {
   }
 }
 
+export function handleBr(element) {
+  document.getSelection().removeAllRanges()
+  let range = new Range()
+  let firstNode = element.firstChild
+  range.setStart(firstNode, 0)
+  range.setEnd(firstNode, 0)
+  document.getSelection().addRange(range)
+}
+export function handleBrFromEnd(element) {
+  document.getSelection().removeAllRanges()
+  let range = new Range()
+  let lastNode = element.lastChild
+  range.setStart(lastNode, lastNode.length)
+  range.setEnd(lastNode, lastNode.length)
+  document.getSelection().addRange(range)
+}
+
+export function hasElementBrAsFirstOrLastNode(element) {
+  const firstNode = element.firstChild
+  if (firstNode.nodeName === 'BR') return true
+
+  const lastNode = element.lastChild
+  if (lastNode.nodeName === 'BR') return true
+
+  return false
+}
+
 export function putCaretAtStartOfElement(el) {
   document.getSelection().removeAllRanges()
   let range = new Range()
@@ -192,6 +229,8 @@ export function getCaretIndex(element) {
   return position;
 }
 
+// TODO: there is bug
+// TODO: Solution - just check for br?
 export function isCaretOnFirstLine(element) {
   if (element.ownerDocument.activeElement !== element) return false
 
