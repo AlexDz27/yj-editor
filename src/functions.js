@@ -1,8 +1,145 @@
+import { TEXT_NODE_TYPE, LEFT_EXTREME_EDGE_POINT, PERFECT_DIAPASON_FOR_CHARS } from './constants'
+
+export function setCaretAccordingToPrevXCoord(element, prevXCoord) {
+  if (hasElementBrAsFirstOrLastNode(element)) {
+    putCaretAtStartOfElementWithBrAsFirstNode(element)
+    return
+  }
+
+  putCaretAtStartOfElement(element)
+
+  adjustCaret(element, prevXCoord)
+
+
+  function adjustCaret(element, xBefore) {
+    let xAfter = getCaretCoordinates().x
+    const lastChild = element.lastChild
+    let lastChildTextNode = lastChild
+    while (lastChildTextNode.nodeType !== TEXT_NODE_TYPE) {
+      lastChildTextNode = lastChildTextNode.lastChild
+    }
+    let currentIteratingNode = element.firstChild
+    while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
+      currentIteratingNode = currentIteratingNode.firstChild
+    }
+
+    let caretPos = 0    
+    while (!isInDiapason(xBefore, xAfter)) {
+      let adjustingRange = document.getSelection().getRangeAt(0)
+      caretPos++
+      // handle basic case - one node
+      if (caretPos <= currentIteratingNode.length) {
+        adjustingRange.setStart(currentIteratingNode, caretPos)
+        adjustingRange.setEnd(currentIteratingNode, caretPos)
+        document.getSelection().addRange(adjustingRange)
+      // if there is more than one node
+      } else {
+        // exit out of logic if we reached the end of row
+        if (currentIteratingNode === lastChildTextNode) return
+
+        // if necessary to go up, go up until there is place to move
+        while (!currentIteratingNode.nextSibling) {
+          currentIteratingNode = currentIteratingNode.parentNode
+        }
+
+        // move
+        currentIteratingNode = currentIteratingNode.nextSibling
+        // if necessary, go down (deeper)
+        while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
+          currentIteratingNode = currentIteratingNode.firstChild
+        }
+        caretPos = 0
+      }
+
+      xAfter = getCaretCoordinates().x
+    }
+  }
+}
+
+export function setCaretAccordingToPrevXCoordFromEnd(element, prevXCoord) {
+  if (hasElementBrAsFirstOrLastNode(element)) {
+    putCaretAtEndOfElementWithBrAsLastNode(element)
+    return
+  }
+
+  putCaretAtEndOfElement(element)
+
+  // EC when [up] 'oooooooo'| and 'oooo'|
+  if (prevXCoord > getCaretCoordinates().x) return
+  adjustCaretFromEnd(element, prevXCoord)
+
+
+  function adjustCaretFromEnd(element, xBefore) {
+    let xAfter = getCaretCoordinates().x
+    const lastChild = element.lastChild
+    let currentIteratingNode = lastChild
+
+    while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
+      currentIteratingNode = currentIteratingNode.lastChild
+    }
+    let caretPos = currentIteratingNode.length
+    while (!isInDiapason(xBefore, xAfter)) {
+      let adjustingRange = document.getSelection().getRangeAt(0)
+      caretPos--
+      // handle basic case - one node
+      if (caretPos >= 0) {
+        adjustingRange.setStart(currentIteratingNode, caretPos)
+        adjustingRange.setEnd(currentIteratingNode, caretPos)
+        document.getSelection().addRange(adjustingRange)
+      // if there is more than one node (if we arrived at start of node)
+      } else {
+        while (!currentIteratingNode.previousSibling) {
+          currentIteratingNode = currentIteratingNode.parentNode
+        }
+
+        // move
+        currentIteratingNode = currentIteratingNode.previousSibling
+
+        // drill
+        while (currentIteratingNode.nodeType !== TEXT_NODE_TYPE) {
+          currentIteratingNode = currentIteratingNode.lastChild
+        }
+
+        caretPos = currentIteratingNode.length
+      }
+
+      xAfter = getCaretCoordinates().x
+    }
+  }
+}
+
+export function putCaretAtStartOfElementWithBrAsFirstNode(element) {
+  document.getSelection().removeAllRanges()
+  let range = new Range()
+  let firstNode = element.firstChild
+  range.setStart(firstNode, 0)
+  range.setEnd(firstNode, 0)
+  document.getSelection().addRange(range)
+}
+export function putCaretAtEndOfElementWithBrAsLastNode(element) {
+  document.getSelection().removeAllRanges()
+  let range = new Range()
+  let lastNode = element.lastChild
+  range.setStart(lastNode, lastNode.length)
+  range.setEnd(lastNode, lastNode.length)
+  document.getSelection().addRange(range)
+}
+
+export function hasElementBrAsFirstOrLastNode(element) {
+  const firstNode = element.firstChild
+  if (firstNode.nodeName === 'BR') return true
+
+  const lastNode = element.lastChild
+  if (lastNode.nodeName === 'BR') return true
+
+  return false
+}
+
 export function putCaretAtStartOfElement(el) {
   document.getSelection().removeAllRanges()
   let range = new Range()
   let firstNode = el.firstChild // might be textNode or regularNode. The goal is textNode
-  while (firstNode.nodeType !== 3) {
+  while (firstNode.nodeType !== TEXT_NODE_TYPE) {
     firstNode = firstNode.firstChild
   }
   range.setStart(firstNode, 0)
@@ -14,15 +151,14 @@ export function putCaretAtEndOfElement(el) {
   document.getSelection().removeAllRanges()
   let range = new Range()
   let lastNode = el.lastChild // might be textNode or regularNode. The goal is textNode
-  while (lastNode.nodeType !== 3) {
-    lastNode = lastNode.firstChild
+  while (lastNode.nodeType !== TEXT_NODE_TYPE) {
+    lastNode = lastNode.lastChild
   }
   range.setStart(lastNode, lastNode.length)
   range.setEnd(lastNode, lastNode.length)
   document.getSelection().addRange(range)
 }
 
-// TODO: remove(
 export function getCaretIndex(element) {
   let position = 0;
   const isSupported = typeof window.getSelection !== "undefined";
@@ -55,6 +191,17 @@ export function isCaretOnFirstLine(element) {
 
   let originalCaretRange = selection.getRangeAt(0)
 
+  // Ref #1
+  if (originalCaretRange.startContainer.nodeName === 'BR' && originalCaretRange.startContainer === element.firstChild) {
+    return true
+  }
+  if (originalCaretRange.startContainer.nodeName === 'BR' && element.lastChild.nodeName === 'BR') {
+    return false
+  }
+  if (originalCaretRange.startContainer === element && originalCaretRange.startOffset > 0) {
+    return false
+  }
+
   // Bail if there is text selected
   if (originalCaretRange.toString().length > 0) return false
 
@@ -79,13 +226,6 @@ export function isCaretOnFirstLine(element) {
   return originalCaretRect.top === endOfElementRect.top
 }
 
-/**
- * Check if the caret is on the last line of an element
- * Returns `false` when the caret is part of a selection
- *
- * @param {Element} element
- * @return {boolean}
- */
 export function isCaretOnLastLine(element) {
   if (element.ownerDocument.activeElement !== element) return false
 
@@ -95,6 +235,23 @@ export function isCaretOnLastLine(element) {
   if (selection.rangeCount === 0) return false
 
   let originalCaretRange = selection.getRangeAt(0)
+
+  // Ref #1
+  if (originalCaretRange.startContainer.nodeName === 'BR' && originalCaretRange.startContainer === element.lastChild) {
+    return true
+  }
+  if (originalCaretRange.startContainer.nodeName === 'BR') {
+    return false
+  }
+  if (originalCaretRange.startContainer === element && originalCaretRange.startOffset < element.children.length) {
+    // Ref #1.1
+    const regex = new RegExp('^(<br>)*$')
+    if (regex.test(element.innerHTML) && originalCaretRange.startOffset <= (element.children.length - 1)) {
+      return true
+    }
+
+    return false
+  }
 
   // Bail if there is a selection
   if (originalCaretRange.toString().length > 0) return false
@@ -134,16 +291,16 @@ export function getCaretCoordinates() {
       if (rect) {
         x = rect.left;
         y = rect.top;
-      // probably i should write else bc bug w/ ceditable - if no content, rect is undefined
+        // probably i should write else bc bug w/ ceditable - if no content, rect is undefined
       } else {
-        x = 167 // left extreme edge point
+        x = LEFT_EXTREME_EDGE_POINT
       }
     }
   }
   return { x, y };
 }
 
-export function isInDiapason(value1, value2, diapason) {
+export function isInDiapason(value1, value2, diapason = PERFECT_DIAPASON_FOR_CHARS) {
   let delta = value1 - value2
   if (Math.abs(delta) < diapason) return true
   return false
