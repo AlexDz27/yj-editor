@@ -1,38 +1,14 @@
-import { NAV_BEHAVIOR, TEXT_NODE_TYPE, LEFT_EXTREME_EDGE_POINT, PERFECT_DIAPASON_FOR_CHARS } from './constants'
+import { TEXT_NODE_TYPE, LEFT_EXTREME_EDGE_POINT, PERFECT_DIAPASON_FOR_CHARS } from './constants'
 
 export function setCaretAccordingToPrevXCoord(element, prevXCoord) {
   if (hasElementBrAsFirstOrLastNode(element)) {
-    handleBr(element)
+    putCaretAtStartOfElementWithBrAsFirstNode(element)
     return
   }
 
   putCaretAtStartOfElement(element)
 
-  // Arrow navigation logic start
-  let behavior
-  if (isCaretOnFirstLine(element) && isCaretOnLastLine(element)) {
-    behavior = NAV_BEHAVIOR.SINGLE_LINE
-  } else if (element.querySelector('br')) {
-    behavior = NAV_BEHAVIOR.MULTILINE_WITH_BR
-  } else {
-    behavior = NAV_BEHAVIOR.MULTILINE
-  }
-
-  switch (behavior) {
-    // TODO: ( rewrite into MULTILINE_OR_SINGLE_LINE
-    case NAV_BEHAVIOR.MULTILINE:
-    case NAV_BEHAVIOR.SINGLE_LINE:
-      adjustCaret(element, prevXCoord)
-      break;
-    
-    case NAV_BEHAVIOR.MULTILINE_WITH_BR:
-      console.log('multiline with br')
-      console.log('TODO: implement multiline with br')
-      break;
-
-    default:
-      console.error('Unknown behavior')
-  }
+  adjustCaret(element, prevXCoord)
 
 
   function adjustCaret(element, xBefore) {
@@ -82,7 +58,7 @@ export function setCaretAccordingToPrevXCoord(element, prevXCoord) {
 
 export function setCaretAccordingToPrevXCoordFromEnd(element, prevXCoord) {
   if (hasElementBrAsFirstOrLastNode(element)) {
-    handleBrFromEnd(element)
+    putCaretAtEndOfElementWithBrAsLastNode(element)
     return
   }
 
@@ -90,32 +66,8 @@ export function setCaretAccordingToPrevXCoordFromEnd(element, prevXCoord) {
 
   // EC when [up] 'oooooooo'| and 'oooo'|
   if (prevXCoord > getCaretCoordinates().x) return
+  adjustCaretFromEnd(element, prevXCoord)
 
-  // Arrow navigation logic start
-  let behavior
-  if (isCaretOnFirstLine(element) && isCaretOnLastLine(element)) {
-    behavior = NAV_BEHAVIOR.SINGLE_LINE
-  } else if (element.querySelector('br')) {
-    behavior = NAV_BEHAVIOR.MULTILINE_WITH_BR
-  } else {
-    behavior = NAV_BEHAVIOR.MULTILINE
-  }
-
-  switch (behavior) {
-    // TODO: ( rewrite into MULTILINE_OR_SINGLE_LINE
-    case NAV_BEHAVIOR.MULTILINE:
-    case NAV_BEHAVIOR.SINGLE_LINE:
-      adjustCaretFromEnd(element, prevXCoord)
-      break;
-    
-    case NAV_BEHAVIOR.MULTILINE_WITH_BR:
-      console.log('multiline with br')
-      console.log('TODO: implement multiline with br')
-      break;
-
-    default:
-      console.error('Unknown behavior')
-  }
 
   function adjustCaretFromEnd(element, xBefore) {
     let xAfter = getCaretCoordinates().x
@@ -156,7 +108,7 @@ export function setCaretAccordingToPrevXCoordFromEnd(element, prevXCoord) {
   }
 }
 
-export function handleBr(element) {
+export function putCaretAtStartOfElementWithBrAsFirstNode(element) {
   document.getSelection().removeAllRanges()
   let range = new Range()
   let firstNode = element.firstChild
@@ -164,7 +116,7 @@ export function handleBr(element) {
   range.setEnd(firstNode, 0)
   document.getSelection().addRange(range)
 }
-export function handleBrFromEnd(element) {
+export function putCaretAtEndOfElementWithBrAsLastNode(element) {
   document.getSelection().removeAllRanges()
   let range = new Range()
   let lastNode = element.lastChild
@@ -229,8 +181,6 @@ export function getCaretIndex(element) {
   return position;
 }
 
-// TODO: there is bug
-// TODO: Solution - just check for br?
 export function isCaretOnFirstLine(element) {
   if (element.ownerDocument.activeElement !== element) return false
 
