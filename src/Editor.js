@@ -66,7 +66,6 @@ function Editor() {
   }
 
   const currentlyDraggedRowPosIdx = useRef(null)
-  // TODO: Ref 3 - describe general algo
   function setRowsAfterDragAndDrop(droppedRow) {
     const rowsBeingUpdated = [...rows]
     const rowsWithoutDroppedRow = rowsBeingUpdated.filter(row => row.id !== droppedRow.id)
