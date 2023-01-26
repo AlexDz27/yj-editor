@@ -1,9 +1,11 @@
 .outerRow {
   position: relative;
+  margin-bottom: 10px;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
 }
 
 .row {
-  margin-bottom: 20px;
   padding-top: 4px;
   padding-bottom: 4px;
   padding-left: 4px;

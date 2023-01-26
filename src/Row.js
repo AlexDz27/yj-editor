@@ -2,10 +2,12 @@ import './row.css'
 import { useEffect, useRef, useState } from 'react'
 import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, setCaretAccordingToPrevXCoord, setCaretAccordingToPrevXCoordFromEnd } from './functions'
 
-function Row({ posIdx, placeholder, isActive, xBeforeRemembered, navIntentToGoUp, addRows, setActive, rememberXBefore }) {
+function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentToGoUp, currentlyDraggedRowPosIdx, addRows, setActive, rememberXBefore }) {
   const isClicked = useRef(false)
   const ref = useRef(null)
   const [isHighlighted, setIsHighlighted] = useState(false)
+
+  const [whichDropZoneBorderIsHighlighted, setWhichDropZoneBorderIsHighlighted] = useState(null)
 
   function handleEnterAndArrows(e) {
     navIntentToGoUp.current = false
@@ -52,7 +54,43 @@ function Row({ posIdx, placeholder, isActive, xBeforeRemembered, navIntentToGoUp
   }, [isActive])
 
   return (
-    <div className="outerRow">
+    <div
+      className="outerRow"
+      draggable
+      data-posidx={posIdx}
+      style={{[`border${whichDropZoneBorderIsHighlighted}`]: '5px solid #14c4e396'}}
+      onDragStart={(e) => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({posIdx, id, placeholder, isActive}))
+        currentlyDraggedRowPosIdx.current = posIdx
+      }}
+      onDrop={(e) => {
+        e.preventDefault()
+
+        const row = JSON.parse(e.dataTransfer.getData('text/plain'))
+        row.dropDirection = whichDropZoneBorderIsHighlighted
+        // TODO: actually implement releasing the draggable
+
+        setWhichDropZoneBorderIsHighlighted(null)
+      }}
+      onDragOver={(e) => {
+        // Ref #2
+        e.preventDefault()
+        e.dataTransfer.dropEffect = 'move'
+
+        // Highlight top or bottom border to inform the user where the dragged row will be placed
+        if (posIdx === currentlyDraggedRowPosIdx.current) return  // Skip highlighting if it's the row we are currently dragging
+        const dropZoneRowRect = e.target.getBoundingClientRect()
+        const mouseY = e.clientY
+        const mouseYRelativeToDropZoneRowRect = mouseY - dropZoneRowRect.top
+
+        if (mouseYRelativeToDropZoneRowRect > (dropZoneRowRect.bottom - dropZoneRowRect.top) / 2) {
+          setWhichDropZoneBorderIsHighlighted('Bottom')
+        } else {
+          setWhichDropZoneBorderIsHighlighted('Top')
+        }
+      }}
+      onDragLeave={() => setWhichDropZoneBorderIsHighlighted(null)}
+    >
       <button className={'dragHandler ' + (isActive ? 'dib' : '')}>
         <div className="dragHandlerBar"></div>
         <div className="dragHandlerBar"></div>

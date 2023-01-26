@@ -6,6 +6,7 @@ import { LEFT_EXTREME_EDGE_POINT } from './constants'
 function Editor() {
   const navIntentToGoUp = useRef(false)
   const xBeforeRemembered = useRef(LEFT_EXTREME_EDGE_POINT)
+  // TODO: ref without func, just use '.current'
   function rememberXBefore(xBefore) {
     xBeforeRemembered.current = xBefore
   }
@@ -68,6 +69,8 @@ function Editor() {
     setRows(mergedHalvesWithNewRow)
   }
 
+  const currentlyDraggedRowPosIdx = useRef(null)
+
   return (
     <section className="editor">
       {rows.map(({posIdx, id, placeholder, isActive}) => (
@@ -79,6 +82,7 @@ function Editor() {
           isActive={isActive}
           xBeforeRemembered={xBeforeRemembered}
           navIntentToGoUp={navIntentToGoUp}
+          currentlyDraggedRowPosIdx={currentlyDraggedRowPosIdx}
           addRows={addRows}
           setActive={setActive}
           rememberXBefore={rememberXBefore}
