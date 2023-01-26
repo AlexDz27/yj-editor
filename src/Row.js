@@ -2,7 +2,7 @@ import './row.css'
 import { useEffect, useRef, useState } from 'react'
 import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, setCaretAccordingToPrevXCoord, setCaretAccordingToPrevXCoordFromEnd } from './functions'
 
-function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentToGoUp, currentlyDraggedRowPosIdx, addRows, setActive, rememberXBefore, setRowsAfterDragAndDrop }) {
+function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentToGoUp, currentlyDraggedRowPosIdx, addRows, setActive, setRowsAfterDragAndDrop }) {
   const isClicked = useRef(false)
   const ref = useRef(null)
   const [isHighlighted, setIsHighlighted] = useState(false)
@@ -20,7 +20,7 @@ function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentTo
     if (e.key === 'ArrowUp') {
       if (isCaretOnFirstLine(ref.current)) {
         e.preventDefault()
-        rememberXBefore(getCaretCoordinates().x)
+        xBeforeRemembered.current = getCaretCoordinates().x
         navIntentToGoUp.current = true
         setActive(posIdx - 1)
       }
@@ -29,7 +29,7 @@ function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentTo
     if (e.key === 'ArrowDown') {
       if (isCaretOnLastLine(ref.current)) {
         e.preventDefault()
-        rememberXBefore(getCaretCoordinates().x)
+        xBeforeRemembered.current = getCaretCoordinates().x
         setActive(posIdx + 1)
       }
     }
@@ -69,7 +69,6 @@ function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentTo
         const droppedRow = JSON.parse(e.dataTransfer.getData('text/plain'))
         droppedRow.dropDirection = whichDropZoneBorderIsHighlighted
         droppedRow.droppedOntoRowPosIdx = Number(e.currentTarget.dataset.posidx)
-        // TODO: actually implement releasing the draggable
         setRowsAfterDragAndDrop(droppedRow)
 
         setWhichDropZoneBorderIsHighlighted(null)
