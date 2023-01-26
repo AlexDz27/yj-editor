@@ -70,6 +70,35 @@ function Editor() {
   }
 
   const currentlyDraggedRowPosIdx = useRef(null)
+  // TODO: Ref 3 - describe general algo
+  function setRowsAfterDragAndDrop(droppedRow) {
+    const rowsBeingUpdated = [...rows]
+    const rowsWithoutDroppedRow = rowsBeingUpdated.filter(row => row.id !== droppedRow.id)
+
+    // Decide firstHalf and secondHalf
+    const droppedOntoRowIdx = rowsWithoutDroppedRow.findIndex(row => row.posIdx === droppedRow.droppedOntoRowPosIdx)
+    let firstHalf
+    let secondHalf
+    if (droppedRow.dropDirection === 'Top') {
+      const rowsBeforeDroppedOntoRow = rowsWithoutDroppedRow.slice(0, droppedOntoRowIdx)
+      firstHalf = rowsBeforeDroppedOntoRow
+      secondHalf = rowsWithoutDroppedRow.slice(droppedOntoRowIdx)
+    } else if (droppedRow.dropDirection === 'Bottom') {
+      const rowsAfterDroppedOntoRow = rowsWithoutDroppedRow.slice(0, droppedOntoRowIdx + 1)
+      firstHalf = rowsAfterDroppedOntoRow
+      secondHalf = rowsWithoutDroppedRow.slice(droppedOntoRowIdx + 1)
+    }
+
+    // Glue firstHalf, droppedRow, and secondHalf together
+    const mergedHalvesWithDroppedRow = firstHalf.concat(droppedRow, secondHalf)
+    // Recalculate posIdxes
+    for (let i = 0; i < mergedHalvesWithDroppedRow.length; i++) {
+      const row = mergedHalvesWithDroppedRow[i]
+      row.posIdx = i
+    }
+
+    setRows(mergedHalvesWithDroppedRow)
+  }
 
   return (
     <section className="editor">
@@ -86,6 +115,7 @@ function Editor() {
           addRows={addRows}
           setActive={setActive}
           rememberXBefore={rememberXBefore}
+          setRowsAfterDragAndDrop={setRowsAfterDragAndDrop}
         />
       ))}
     </section>

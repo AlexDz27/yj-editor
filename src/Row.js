@@ -2,7 +2,7 @@ import './row.css'
 import { useEffect, useRef, useState } from 'react'
 import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, setCaretAccordingToPrevXCoord, setCaretAccordingToPrevXCoordFromEnd } from './functions'
 
-function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentToGoUp, currentlyDraggedRowPosIdx, addRows, setActive, rememberXBefore }) {
+function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentToGoUp, currentlyDraggedRowPosIdx, addRows, setActive, rememberXBefore, setRowsAfterDragAndDrop }) {
   const isClicked = useRef(false)
   const ref = useRef(null)
   const [isHighlighted, setIsHighlighted] = useState(false)
@@ -66,9 +66,11 @@ function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentTo
       onDrop={(e) => {
         e.preventDefault()
 
-        const row = JSON.parse(e.dataTransfer.getData('text/plain'))
-        row.dropDirection = whichDropZoneBorderIsHighlighted
+        const droppedRow = JSON.parse(e.dataTransfer.getData('text/plain'))
+        droppedRow.dropDirection = whichDropZoneBorderIsHighlighted
+        droppedRow.droppedOntoRowPosIdx = Number(e.currentTarget.dataset.posidx)
         // TODO: actually implement releasing the draggable
+        setRowsAfterDragAndDrop(droppedRow)
 
         setWhichDropZoneBorderIsHighlighted(null)
       }}
