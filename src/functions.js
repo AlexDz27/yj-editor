@@ -120,6 +120,10 @@ export function putCaretAtEndOfElementWithBrAsLastNode(element) {
   document.getSelection().removeAllRanges()
   let range = new Range()
   let lastNode = element.lastChild
+  // Ref 4
+  while (lastNode.hasChildNodes()) {  // if needed, drilling until br is found
+    lastNode = lastNode.lastChild
+  }
   range.setStart(lastNode, lastNode.length)
   range.setEnd(lastNode, lastNode.length)
   document.getSelection().addRange(range)
@@ -132,6 +136,19 @@ export function hasElementBrAsFirstOrLastNode(element) {
   const lastNode = element.lastChild
   if (lastNode.nodeName === 'BR') return true
 
+  // check if br is present inside tag type nodes at start or end
+  let iteratorNode = firstNode
+  while (iteratorNode.hasChildNodes()) {
+    iteratorNode = iteratorNode.firstChild
+  }
+  if (iteratorNode.nodeName === 'BR') return true
+
+  iteratorNode = lastNode
+  while (iteratorNode.hasChildNodes()) {
+    iteratorNode = iteratorNode.lastChild
+  }
+  if (iteratorNode.nodeName === 'BR') return true
+  
   return false
 }
 
@@ -237,12 +254,21 @@ export function isCaretOnLastLine(element) {
   let originalCaretRange = selection.getRangeAt(0)
 
   // Ref #1
-  if (originalCaretRange.startContainer.nodeName === 'BR' && originalCaretRange.startContainer === element.lastChild) {
-    return true
-  }
+  // если просто в конце br 
   if (originalCaretRange.startContainer.nodeName === 'BR') {
+    // и br не находится внутри каких-то нод
+    if (originalCaretRange.startContainer === element.lastChild) return true
+
+    // если br находится внутри каких-то нод
+    let drilledLastChild = element
+    while (drilledLastChild.hasChildNodes()) {
+      drilledLastChild = drilledLastChild.lastChild
+    }
+    if (originalCaretRange.startContainer === drilledLastChild) return true
+
     return false
   }
+  
   if (originalCaretRange.startContainer === element && originalCaretRange.startOffset < element.children.length) {
     // Ref #1.1
     const regex = new RegExp('^(<br>)*$')
