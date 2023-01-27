@@ -1,8 +1,9 @@
 import './row.css'
 import { useEffect, useRef, useState } from 'react'
 import { getCaretCoordinates, isCaretOnFirstLine, isCaretOnLastLine, setCaretAccordingToPrevXCoord, setCaretAccordingToPrevXCoordFromEnd } from './functions'
+import { TEXT_NODE_TYPE } from './constants'
 
-function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentToGoUp, currentlyDraggedRowPosIdx, addRows, setActive, setRowsAfterDragAndDrop }) {
+function Row({ posIdx, id, text, isActive, xBeforeRemembered, navIntentToGoUp, currentlyDraggedRowPosIdx, addRow, setActive, setRowsAfterDragAndDrop }) {
   const isClicked = useRef(false)
   const ref = useRef(null)
   const [isHighlighted, setIsHighlighted] = useState(false)
@@ -14,7 +15,54 @@ function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentTo
 
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      addRows(posIdx)
+
+      const selection = window.getSelection()
+      if (!selection.isCollapsed) return
+      console.log(selection)
+      // TODO: handle case with from my notebook
+      let leftOverText = '' // TODO: ref down
+      // Simple case
+      console.log('selection.anchorOffset', selection.anchorOffset, 'selection.anchorNode.length', selection.anchorNode.length)
+      console.log('nextSibl', selection.anchorNode.nextSibling)
+      if (selection.anchorOffset < selection.anchorNode.length) {
+        console.log('there is leftOverText')
+      // Nodes case
+      } else if (selection.anchorNode.nextSibling) {
+        if (selection.anchorNode.nextSibling.nodeName === 'BR') return
+        let anchorNodeNextSiblingTextNode = selection.anchorNode.nextSibling
+        while (anchorNodeNextSiblingTextNode.nodeType !== TEXT_NODE_TYPE) {
+          anchorNodeNextSiblingTextNode = anchorNodeNextSiblingTextNode.firstChild
+        }
+        console.log('nextSiblText', anchorNodeNextSiblingTextNode, 'nextSiblTextLen', anchorNodeNextSiblingTextNode.length)
+        if (anchorNodeNextSiblingTextNode.length > 0) {
+          console.log('there is leftOverText in nextSibling node')
+        }
+      // If caret is stuck, e.g. Bqwe|BUIzxcIU  
+      } else if (!selection.anchorNode.nextSibling) {
+        let iteratorNode = selection.anchorNode
+        while (!iteratorNode.parentNode?.classList?.contains('row')) {
+          iteratorNode = iteratorNode.parentNode
+        }
+        const outerAnchorNode = iteratorNode
+        // TODO: мне навероно надо этот элс-иф переносить как-то наверх, тк
+        // вроде как мне нужна логика из Nodes case
+        if (outerAnchorNode.nextSibling) {  // TODO: вроде работает, но один раз как будто был баг что не доходил код до сюда...
+          console.log('we can continue onto next node to find if it contains some left over text')
+          console.log('ref.cur.lastChild', ref.current.lastChild, 'ref.current.lastChild.childNodes.length', ref.current.lastChild.childNodes.length)
+          let howManyCharsOrNodesToSelect
+          // if focus node is a node
+          if (ref.current.lastChild.childNodes.length > 0) {
+            howManyCharsOrNodesToSelect = ref.current.lastChild.childNodes.length
+          // if focus node is a text
+          } else {
+            howManyCharsOrNodesToSelect = ref.current.lastChild.length
+          }
+          selection.setBaseAndExtent(selection.anchorNode, selection.anchorOffset, ref.current.lastChild, howManyCharsOrNodesToSelect)
+        }
+      }
+      // TODO: ref: func isTextLeftOver() <- logic
+
+      // addRow(posIdx, leftOverText)
     }
 
     if (e.key === 'ArrowUp') {
@@ -60,7 +108,7 @@ function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentTo
       data-posidx={posIdx}
       style={{[`border${whichDropZoneBorderIsHighlighted}`]: '5px solid #14c4e396'}}
       onDragStart={(e) => {
-        e.dataTransfer.setData('text/plain', JSON.stringify({posIdx, id, placeholder, isActive}))
+        e.dataTransfer.setData('text/plain', JSON.stringify({posIdx, id, text, isActive}))
         currentlyDraggedRowPosIdx.current = posIdx
       }}
       onDrop={(e) => {
@@ -127,7 +175,7 @@ function Row({ posIdx, id, placeholder, isActive, xBeforeRemembered, navIntentTo
         className="row"
         style={{ backgroundColor: isHighlighted ? '#f0f0f0' : 'initial' }}
       >
-        {placeholder}
+        {text}
       </div>
     </div>
   )
